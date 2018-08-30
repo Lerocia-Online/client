@@ -340,8 +340,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 689001731}
-  - component: {fileID: 689001730}
   - component: {fileID: 689001729}
+  - component: {fileID: 689001730}
   m_Layer: 0
   m_Name: Network Manager
   m_TagString: Untagged
@@ -372,7 +372,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 689001728}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -822479833, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Script: {fileID: 11500000, guid: d6ff220bdd2d54dc0a004ce1463706be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_NetworkPort: 7777
