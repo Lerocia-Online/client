@@ -12,8 +12,11 @@ public class CustomNetworkManager : NetworkManager {
 
     private void Awake() {
         if (IsHeadless()) {
-            print("headless mode detected");
+            Debug.Log("starting server");
             StartServer();
+        } else {
+            Debug.Log("connecting to server");
+            StartClient();
         }
     }
 }
