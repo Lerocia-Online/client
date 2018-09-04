@@ -359,10 +359,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ff220bdd2d54dc0a004ce1463706be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_NetworkPort: 7777
+  m_NetworkPort: 0
   m_ServerBindToIP: 0
   m_ServerBindAddress: 
-  m_NetworkAddress: 52.207.114.31
+  m_NetworkAddress: 
   m_DontDestroyOnLoad: 1
   m_RunInBackground: 1
   m_ScriptCRCCheck: 1
