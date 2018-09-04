@@ -499,6 +499,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 486d382ee547a4ad894779408d165cab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  destroyOnDeath: 0
   currentHealth: 100
   healthBar: {fileID: 224043675021522634}
 --- !u!114 &114941809677443326
