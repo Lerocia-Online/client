@@ -649,7 +649,7 @@ PlayerSettings:
   facebookSdkVersion: 7.9.4
   apiCompatibilityLevel: 2
   cloudProjectId: 4329406a-a807-419b-886d-e8c74ec27de5
-  projectName: Multiplayer Example
+  projectName: Multiplayer Project
   organizationId: cupants
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
