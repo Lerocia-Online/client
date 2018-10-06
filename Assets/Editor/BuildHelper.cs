@@ -1,12 +1,10 @@
 using UnityEditor;
+using UnityEngine;
 
-namespace Editor
-{
-    class BuildHelper {
-        static void build() {
-            string[] scenes = {"Assets/Scenes/Main.unity"};
-            string pathToDeploy = "Builds/ServerBuild";
-            BuildPipeline.BuildPlayer(scenes, pathToDeploy, BuildTarget.StandaloneLinuxUniversal, BuildOptions.EnableHeadlessMode);
-        }
+class BuildHelper {
+    static void build() {
+        string[] scenes = {"Assets/Scenes/Main.unity"};
+        string pathToDeploy = "Builds/ServerBuild";
+        BuildPipeline.BuildPlayer(scenes, pathToDeploy, BuildTarget.StandaloneLinuxUniversal, BuildOptions.EnableHeadlessMode);
     }
 }
