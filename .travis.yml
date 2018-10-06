@@ -1,3 +1,5 @@
+sudo: enabled
+os: osx
 before_install:
 - chmod a+x ./Assets/Scripts/install.sh
 - chmod a+x ./Assets/Scripts/build.sh
