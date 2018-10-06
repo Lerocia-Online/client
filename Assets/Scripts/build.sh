@@ -9,4 +9,4 @@ echo 'Logs from build'
 cat $(pwd)/unity.log
 
 echo 'Attempting to zip builds'
-zip -r $(pwd)/Builds/server.zip $(pwd)/Builds/
+zip -r $(pwd)/Builds/server.zip . -i $(pwd)/Builds/
