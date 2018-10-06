@@ -1,7 +1,7 @@
 before_install:
-- chmod a+x ./Multiplayer\ Project/Assets/Scripts/install.sh
-- chmod a+x ./Multiplayer\ Project/Assets/Scripts/build.sh
+- chmod a+x Multiplayer\ Project/Assets/Scripts/install.sh
+- chmod a+x Multiplayer\ Project/Assets/Scripts/build.sh
 install:
-- ./Multiplayer\ Project/Assets/Scripts/install.sh
+- Multiplayer\ Project/Assets/Scripts/install.sh
 script:
-- ./Multiplayer\ Project/Assets/Scripts/build.sh
+- Multiplayer\ Project/Assets/Scripts/build.sh
