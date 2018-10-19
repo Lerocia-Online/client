@@ -54,5 +54,5 @@
 *.unity linguist-generated
 
 # Network settings
-Assets/Scripts/NetworkSettings.cs merge=ours
-Assets/Scripts/NetworkSettings.cs.meta merge=ours
+NetworkSettings.cs merge=ours
+NetworkSettings.cs.meta merge=ours
