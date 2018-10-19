@@ -52,3 +52,7 @@
 *.meta linguist-generated
 *.prefab linguist-generated
 *.unity linguist-generated
+
+# Network settings
+NetworkSettings.cs merge=ours
+NetworkSettings.cs.meta merge=ours
