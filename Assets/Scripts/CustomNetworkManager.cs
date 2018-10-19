@@ -13,8 +13,8 @@ public class CustomNetworkManager : NetworkManager {
     }
 
     private void Awake() {
-        networkAddress = "34.207.71.203";
-        networkPort = 7777;
+        networkAddress = NetworkSettings.Address;
+        networkPort = NetworkSettings.Port;
         if (IsHeadless()) {
             Debug.Log("starting server");
             StartServer();
