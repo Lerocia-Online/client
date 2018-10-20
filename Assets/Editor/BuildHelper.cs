@@ -9,11 +9,11 @@ class BuildHelper {
     static void buildWindowsClient() {
         string[] scenes = {"Assets/Scenes/Main.unity"};
         string pathToDeploy = "Builds/WindowsClientBuild";
-        BuildPipeline.BuildPlayer(scenes, pathToDeploy, BuildTarget.StandaloneWindows, BuildOptions.EnableHeadlessMode);
+        BuildPipeline.BuildPlayer(scenes, pathToDeploy, BuildTarget.StandaloneWindows, BuildOptions.None);
     }
     static void buildMacClient() {
         string[] scenes = {"Assets/Scenes/Main.unity"};
         string pathToDeploy = "Builds/MacClientBuild";
-        BuildPipeline.BuildPlayer(scenes, pathToDeploy, BuildTarget.StandaloneOSX, BuildOptions.EnableHeadlessMode);
+        BuildPipeline.BuildPlayer(scenes, pathToDeploy, BuildTarget.StandaloneOSX, BuildOptions.None);
     }
 }
