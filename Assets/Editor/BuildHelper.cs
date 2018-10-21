@@ -9,7 +9,7 @@ class BuildHelper {
     static void buildWindowsClient() {
         string[] scenes = {"Assets/Scenes/Main.unity"};
         string pathToDeploy = "Builds/WindowsClientBuild";
-        BuildPipeline.BuildPlayer(scenes, pathToDeploy, BuildTarget.StandaloneWindows64, BuildOptions.None);
+        BuildPipeline.BuildPlayer(scenes, pathToDeploy, BuildTarget.StandaloneWindows, BuildOptions.None);
     }
     static void buildMacClient() {
         string[] scenes = {"Assets/Scenes/Main.unity"};
