@@ -21,7 +21,7 @@ public class Client : MonoBehaviour {
   private int reliableChannel;
   private int unreliableChannel;
 
-  private int clientId;
+  private int ourClientId;
   private int connectionId;
 
   private float connectionTime;
@@ -32,7 +32,7 @@ public class Client : MonoBehaviour {
   private string playerName;
 
   public GameObject playerPrefab;
-  public List<Player> players = new List<Player>();
+  public Dictionary<int, Player> players = new Dictionary<int, Player>();
 
   public void Connect() {
     // Does the player have a name?
@@ -85,6 +85,10 @@ public class Client : MonoBehaviour {
             SpawnPlayer(splitData[1], int.Parse(splitData[2]));
             break;
           case "DC":
+            PlayerDisconnected(int.Parse(splitData[1]));
+            break;
+          case "ASKPOSITION":
+            OnAskPosition(splitData);
             break;
           default:
             Debug.Log("Invalid message : " + msg);
@@ -96,7 +100,7 @@ public class Client : MonoBehaviour {
 
   private void OnAskName(string[] data) {
     // Set this client's ID
-    clientId = int.Parse(data[1]);
+    ourClientId = int.Parse(data[1]);
     
     // Send our name to the server
     Send("NAMEIS|" + playerName, reliableChannel);
@@ -108,11 +112,35 @@ public class Client : MonoBehaviour {
     }
   }
 
+  private void OnAskPosition(string[] data) {
+    if (!isStarted) {
+      return;
+    }
+    
+    // Update everyone else
+    for (int i = 1; i < data.Length - 1; i++) {
+      string[] d = data[i].Split('%');
+      
+      // Prevent the server from updating us
+      if (ourClientId != int.Parse(d[0])) {
+        Vector3 position = Vector3.zero;
+        position.x = float.Parse(d[1]);
+        position.y = float.Parse(d[2]);
+        players[int.Parse(d[0])].avatar.transform.position = position;
+      }
+    }
+    
+    // Send our own position
+    Vector3 myPosition = players[ourClientId].avatar.transform.position;
+    string m = "MYPOSITION|" + myPosition.x.ToString() + '|' + myPosition.y.ToString();
+    Send(m, unreliableChannel);
+  }
+
   private void SpawnPlayer(string playerName, int cnnId) {
     GameObject go = Instantiate(playerPrefab) as GameObject;
     
     // Is this ours?
-    if (cnnId == clientId) {
+    if (cnnId == ourClientId) {
 
       go.AddComponent<PlayerMotor>();
       GameObject.Find("Canvas").SetActive(false);
@@ -124,7 +152,12 @@ public class Client : MonoBehaviour {
     p.playerName = playerName;
     p.connectionId = cnnId;
     p.avatar.GetComponentInChildren<TextMesh>().text = playerName;
-    players.Add(p);
+    players.Add(cnnId, p);
+  }
+
+  private void PlayerDisconnected(int cnnId) {
+    Destroy(players[cnnId].avatar);
+    players.Remove(cnnId);
   }
   
   private void Send(string message, int channelId) {

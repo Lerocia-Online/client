@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 public class ServerClient {
   public int connectionId;
   public string playerName;
+  public Vector3 position;
 }
 
 public class Server : MonoBehaviour {
@@ -23,6 +24,9 @@ public class Server : MonoBehaviour {
   private byte error;
   
   private List<ServerClient> clients = new List<ServerClient>();
+
+  private float lastMovementUpdate;
+  private float movementUpdateRate = 0.5f;
 
   private void Start() {
     NetworkTransport.Init();
@@ -66,6 +70,9 @@ public class Server : MonoBehaviour {
           case "NAMEIS":
             OnNameIs(connectionId, splitData[1]);
             break;
+          case "MYPOSITION":
+            OnMyPosition(connectionId, float.Parse(splitData[1]), float.Parse(splitData[2]));
+            break;
           default:
             Debug.Log("Invalid message : " + msg);
             break;
@@ -73,7 +80,20 @@ public class Server : MonoBehaviour {
         break;
       case NetworkEventType.DisconnectEvent: 
         Debug.Log("Player " + connectionId + " has disconnected");
+        OnDisconnection(connectionId);
         break;
+    }
+    
+    // Ask player for their position
+    if (Time.time - lastMovementUpdate > movementUpdateRate) {
+      lastMovementUpdate = Time.time;
+      string m = "ASKPOSITION|";
+      foreach (ServerClient sc in clients) {
+        m += sc.connectionId.ToString() + '%' + sc.position.x.ToString() + '%' + sc.position.y.ToString() + '|';
+      }
+
+      m = m.Trim('|');
+      Send(m, unreliableChannel, clients);
     }
   }
 
@@ -97,12 +117,24 @@ public class Server : MonoBehaviour {
     Send(msg, reliableChannel, cnnId);
   }
 
+  private void OnDisconnection(int cnnId) {
+    // Remove this player from our client list
+    clients.Remove(clients.Find(x => x.connectionId == cnnId));
+
+    // Tell everyone that somebody else has disconnected
+    Send("DC|" + cnnId, reliableChannel, clients);
+  }
+
   private void OnNameIs(int cnnId, string playerName) {
     // Link the name to the connection Id
     clients.Find(x => x.connectionId == cnnId).playerName = playerName;
 
     // Tell everybody that a new player has connected
     Send("CNN|" + playerName + '|' + cnnId, reliableChannel, clients);
+  }
+
+  private void OnMyPosition(int cnnId, float x, float y) {
+    clients.Find(c=>c.connectionId == cnnId).position = new Vector3(x, y, 0);
   }
 
   private void Send(string message, int channelId, int cnnId) {
