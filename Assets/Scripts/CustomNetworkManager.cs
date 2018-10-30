@@ -9,8 +9,8 @@ public class CustomNetworkManager : NetworkManager {
   }
 
   private void Awake() {
-    networkAddress = NetworkSettings.Address;
-    networkPort = NetworkSettings.Port;
+    networkAddress = NetworkSettings.ADDRESS;
+    networkPort = NetworkSettings.PORT;
     if (IsHeadless()) {
       Debug.Log("starting server");
       StartServer();

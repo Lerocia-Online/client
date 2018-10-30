@@ -12,7 +12,7 @@ public class ServerClient {
 public class Server : MonoBehaviour {
   private const int MAX_CONNECTION = 100;
 
-  private int port = NetworkSettings.Port;
+  private int port = NetworkSettings.PORT;
 
   private int hostId;
   private int webHostId;
@@ -37,8 +37,8 @@ public class Server : MonoBehaviour {
 
     HostTopology topo = new HostTopology(cc, MAX_CONNECTION);
 
-    hostId = NetworkTransport.AddHost(topo, port, null);
-    webHostId = NetworkTransport.AddWebsocketHost(topo, port, null);
+    hostId = NetworkTransport.AddHost(topo, NetworkSettings.PORT, null);
+    webHostId = NetworkTransport.AddWebsocketHost(topo, NetworkSettings.PORT, null);
 
     isStarted = true;
   }

@@ -13,8 +13,6 @@ public class Player {
 public class Client : MonoBehaviour {
   private const int MAX_CONNECTION = 100;
 
-  private int port = NetworkSettings.Port;
-
   private int hostId;
   private int webHostId;
 
@@ -53,7 +51,7 @@ public class Client : MonoBehaviour {
     HostTopology topo = new HostTopology(cc, MAX_CONNECTION);
 
     hostId = NetworkTransport.AddHost(topo, 0);
-    connectionId = NetworkTransport.Connect(hostId, NetworkSettings.Address, port, 0, out error);
+    connectionId = NetworkTransport.Connect(hostId, NetworkSettings.ADDRESS, NetworkSettings.PORT, 0, out error);
 
     connectionTime = Time.time;
     isConnected = true;
