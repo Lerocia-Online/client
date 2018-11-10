@@ -15,7 +15,6 @@ public class Server : MonoBehaviour {
   private int port = NetworkSettings.PORT;
 
   private int hostId;
-  private int webHostId;
 
   private int reliableChannel;
   private int unreliableChannel;
@@ -38,7 +37,6 @@ public class Server : MonoBehaviour {
     HostTopology topo = new HostTopology(cc, MAX_CONNECTION);
 
     hostId = NetworkTransport.AddHost(topo, NetworkSettings.PORT, null);
-    webHostId = NetworkTransport.AddWebsocketHost(topo, NetworkSettings.PORT, null);
 
     isStarted = true;
   }
