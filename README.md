@@ -39,7 +39,7 @@ public static class NetworkSettings {
 
 Now if you have the address and port of one of the game servers then you would put that here if you wish to test against an existing server, but these steps will continue as if you're running everything locally.
 
-Next you'll need to install the Unity editor. This project uses Unity version 2018.2.5f1. Go to The Unity download archives [here](https://unity3d.com/get-unity/download/archive) and download the Unity 2018.2.5f1 Installer for your operating system.
+Next you'll need to install the Unity editor. This project uses Unity version 2018.2.5f1. Go to The [Unity download archives](https://unity3d.com/get-unity/download/archive) and download the Unity 2018.2.5f1 Installer for your operating system.
 
 When you launch Unity then open an existing project and navigate to the repository you cloned in the first step. You should now have everything to need to edit and test this project, but assuming you're running both client and server locally you'll need to generate a server build if you want a client to connect from your editor window.
 
