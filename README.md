@@ -1,6 +1,6 @@
 # Multiplayer Project
 
-TODO: One Paragraph of project description goes here
+Multiplayer Project is an online multiplayer game built using the Unity3D engine. Players all connect to one world that they can explore together, collect items and weapons, and battle each other!
 
 ## Getting Started - User
 
