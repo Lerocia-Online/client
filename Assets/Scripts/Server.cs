@@ -69,7 +69,7 @@ public class Server : MonoBehaviour {
             OnNameIs(connectionId, splitData[1]);
             break;
           case "MYPOSITION":
-            OnMyPosition(connectionId, float.Parse(splitData[1]), float.Parse(splitData[2]));
+            OnMyPosition(connectionId, float.Parse(splitData[1]), float.Parse(splitData[2]), float.Parse(splitData[3]));
             break;
           default:
             Debug.Log("Invalid message : " + msg);
@@ -87,7 +87,7 @@ public class Server : MonoBehaviour {
       lastMovementUpdate = Time.time;
       string m = "ASKPOSITION|";
       foreach (ServerClient sc in clients) {
-        m += sc.connectionId.ToString() + '%' + sc.position.x.ToString() + '%' + sc.position.y.ToString() + '|';
+        m += sc.connectionId.ToString() + '%' + sc.position.x.ToString() + '%' + sc.position.y.ToString() + '%' + sc.position.z.ToString() + '|';
       }
 
       m = m.Trim('|');
@@ -131,8 +131,8 @@ public class Server : MonoBehaviour {
     Send("CNN|" + playerName + '|' + cnnId, reliableChannel, clients);
   }
 
-  private void OnMyPosition(int cnnId, float x, float y) {
-    clients.Find(c=>c.connectionId == cnnId).position = new Vector3(x, y, 0);
+  private void OnMyPosition(int cnnId, float x, float y, float z) {
+    clients.Find(c=>c.connectionId == cnnId).position = new Vector3(x, y, z);
   }
 
   private void Send(string message, int channelId, int cnnId) {

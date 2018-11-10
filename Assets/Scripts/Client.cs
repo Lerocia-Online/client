@@ -124,13 +124,14 @@ public class Client : MonoBehaviour {
         Vector3 position = Vector3.zero;
         position.x = float.Parse(d[1]);
         position.y = float.Parse(d[2]);
+        position.z = float.Parse(d[3]);
         players[int.Parse(d[0])].avatar.transform.position = position;
       }
     }
     
     // Send our own position
     Vector3 myPosition = players[ourClientId].avatar.transform.position;
-    string m = "MYPOSITION|" + myPosition.x.ToString() + '|' + myPosition.y.ToString();
+    string m = "MYPOSITION|" + myPosition.x.ToString() + '|' + myPosition.y.ToString() + '|' + myPosition.z.ToString();
     Send(m, unreliableChannel);
   }
 

@@ -14,6 +14,7 @@ public class PlayerMotor : MonoBehaviour {
     Vector3 inputs = Vector3.zero;
 
     inputs.x = Input.GetAxis("Horizontal");
+    inputs.z = Input.GetAxis("Vertical");
 
     if (controller.isGrounded) {
       verticalVelocity = -1;
