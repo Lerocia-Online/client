@@ -116,7 +116,7 @@ public class Client : MonoBehaviour {
     }
     
     // Update everyone else
-    for (int i = 1; i < data.Length - 1; i++) {
+    for (int i = 1; i < data.Length; i++) {
       string[] d = data[i].Split('%');
       
       // Prevent the server from updating us
