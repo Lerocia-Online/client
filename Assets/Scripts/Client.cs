@@ -33,6 +33,13 @@ public class Client : MonoBehaviour {
   public Dictionary<int, Player> players = new Dictionary<int, Player>();
 
   public void Connect() {
+    // Is the access key correct?
+    string key = GameObject.Find("KeyInput").GetComponent<InputField>().text;
+    if (key != "90676655") {
+      Debug.Log("Invalid access key");
+      return;
+    }
+    
     // Does the player have a name?
     string pName = GameObject.Find("NameInput").GetComponent<InputField>().text;
     if (pName == "") {
