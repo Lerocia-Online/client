@@ -26,7 +26,7 @@ public class BuildMenu : MonoBehaviour {
   public static void BuildWindows() {
     BuildPlayerOptions buildClientPlayerOptions = new BuildPlayerOptions();
     buildClientPlayerOptions.scenes = new[] { "Assets/Scenes/Client.unity" };
-    buildClientPlayerOptions.locationPathName = "Builds/Client";
+    buildClientPlayerOptions.locationPathName = "Builds/Client.exe";
     buildClientPlayerOptions.target = BuildTarget.StandaloneWindows64;
     buildClientPlayerOptions.options = BuildOptions.None;
 
@@ -34,7 +34,7 @@ public class BuildMenu : MonoBehaviour {
 
     BuildPlayerOptions buildServerPlayerOptions = new BuildPlayerOptions();
     buildServerPlayerOptions.scenes = new[] { "../server/Assets/Scenes/Server.unity" };
-    buildServerPlayerOptions.locationPathName = "Builds/Server";
+    buildServerPlayerOptions.locationPathName = "Builds/Server.exe";
     buildServerPlayerOptions.target = BuildTarget.StandaloneWindows64;
     buildServerPlayerOptions.options = BuildOptions.None;
 
