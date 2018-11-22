@@ -4,6 +4,15 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using System;
+
+[Serializable]
+public class User {
+  public bool success;
+  public string error;
+  public string username;
+  // Add username, etc....
+}
 
 public class Player {
   public string playerName;
@@ -34,6 +43,7 @@ public class Client : MonoBehaviour {
   public Dictionary<int, Player> players = new Dictionary<int, Player>();
 
   private WWWForm form;
+  public string urlLogin = "http://localhost:8888/tmp/action_login.php";
 
   public void Connect() {
     Debug.Log("Logging in...");
@@ -48,26 +58,29 @@ public class Client : MonoBehaviour {
     form.AddField("email", email);
     form.AddField("password", password);
     
-    WWW w = new WWW("http://localhost:8888/tmp/action_login.php", form);
+    WWW w = new WWW(urlLogin, form);
     yield return w;
 
     if (string.IsNullOrEmpty(w.error)) {
-      // success
-      if (w.text.Contains("Invalid email or password")) {
-        Debug.Log("Invalid email or password");
+      User user = JsonUtility.FromJson<User>(w.text);
+      if (user.success) {
+        if (user.error != "") {
+          Debug.Log(user.error);
+        } else {
+          Debug.Log("Login successful");
+          playerName = user.username;
+          JoinGame();
+        }
       } else {
-        Debug.Log("Login success");
-        JoinGame();
+        Debug.Log(user.error);
       }
     } else {
       // error
-      Debug.Log("Login failure");
+      Debug.Log(w.error);
     }
   }
 
   public void JoinGame() {
-    playerName = "MyName";
-    
     NetworkTransport.Init();
     ConnectionConfig cc = new ConnectionConfig();
 
