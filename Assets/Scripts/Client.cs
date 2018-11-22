@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -32,22 +33,40 @@ public class Client : MonoBehaviour {
   public GameObject playerPrefab;
   public Dictionary<int, Player> players = new Dictionary<int, Player>();
 
-  public void Connect() {
-    // Is the access key correct?
-    string key = GameObject.Find("KeyInput").GetComponent<InputField>().text;
-    if (key != "90676655") {
-      Debug.Log("Invalid access key");
-      return;
-    }
-    
-    // Does the player have a name?
-    string pName = GameObject.Find("NameInput").GetComponent<InputField>().text;
-    if (pName == "") {
-      Debug.Log("You must enter a name!");
-      return;
-    }
+  private WWWForm form;
 
-    playerName = pName;
+  public void Connect() {
+    Debug.Log("Logging in...");
+    StartCoroutine("RequestLogin");
+  }
+
+  public IEnumerator RequestLogin() {
+    string email = GameObject.Find("EmailInput").GetComponent<InputField>().text;
+    string password = GameObject.Find("PasswordInput").GetComponent<InputField>().text;
+
+    form = new WWWForm();
+    form.AddField("email", email);
+    form.AddField("password", password);
+    
+    WWW w = new WWW("http://localhost:8888/tmp/action_login.php", form);
+    yield return w;
+
+    if (string.IsNullOrEmpty(w.error)) {
+      // success
+      if (w.text.Contains("Invalid email or password")) {
+        Debug.Log("Invalid email or password");
+      } else {
+        Debug.Log("Login success");
+        JoinGame();
+      }
+    } else {
+      // error
+      Debug.Log("Login failure");
+    }
+  }
+
+  public void JoinGame() {
+    playerName = "MyName";
     
     NetworkTransport.Init();
     ConnectionConfig cc = new ConnectionConfig();
