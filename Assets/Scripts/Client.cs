@@ -43,7 +43,7 @@ public class Client : MonoBehaviour {
   public Dictionary<int, Player> players = new Dictionary<int, Player>();
 
   private WWWForm form;
-  public string urlLogin = "http://localhost:8888/tmp/action_login.php";
+  private string loginEndpoint = "login.php";
 
   public void Connect() {
     Debug.Log("Logging in...");
@@ -51,14 +51,14 @@ public class Client : MonoBehaviour {
   }
 
   public IEnumerator RequestLogin() {
-    string email = GameObject.Find("EmailInput").GetComponent<InputField>().text;
+    string username = GameObject.Find("UsernameInput").GetComponent<InputField>().text;
     string password = GameObject.Find("PasswordInput").GetComponent<InputField>().text;
 
     form = new WWWForm();
-    form.AddField("email", email);
+    form.AddField("username", username);
     form.AddField("password", password);
     
-    WWW w = new WWW(urlLogin, form);
+    WWW w = new WWW(NetworkSettings.API + loginEndpoint, form);
     yield return w;
 
     if (string.IsNullOrEmpty(w.error)) {
@@ -75,7 +75,6 @@ public class Client : MonoBehaviour {
         Debug.Log(user.error);
       }
     } else {
-      // error
       Debug.Log(w.error);
     }
   }
