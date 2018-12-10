@@ -1,8 +1,18 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using System;
+
+[Serializable]
+public class User {
+  public bool success;
+  public string error;
+  public string username;
+  // Add username, etc....
+}
 
 public class Player {
   public string playerName;
@@ -32,16 +42,44 @@ public class Client : MonoBehaviour {
   public GameObject playerPrefab;
   public Dictionary<int, Player> players = new Dictionary<int, Player>();
 
-  public void Connect() {
-    // Does the player have a name?
-    string pName = GameObject.Find("NameInput").GetComponent<InputField>().text;
-    if (pName == "") {
-      Debug.Log("You must enter a name!");
-      return;
-    }
+  private WWWForm form;
+  private string loginEndpoint = "login.php";
 
-    playerName = pName;
+  public void Connect() {
+    Debug.Log("Logging in...");
+    StartCoroutine("RequestLogin");
+  }
+
+  public IEnumerator RequestLogin() {
+    string username = GameObject.Find("UsernameInput").GetComponent<InputField>().text;
+    string password = GameObject.Find("PasswordInput").GetComponent<InputField>().text;
+
+    form = new WWWForm();
+    form.AddField("username", username);
+    form.AddField("password", password);
     
+    WWW w = new WWW(NetworkSettings.API + loginEndpoint, form);
+    yield return w;
+
+    if (string.IsNullOrEmpty(w.error)) {
+      User user = JsonUtility.FromJson<User>(w.text);
+      if (user.success) {
+        if (user.error != "") {
+          Debug.Log(user.error);
+        } else {
+          Debug.Log("Login successful");
+          playerName = user.username;
+          JoinGame();
+        }
+      } else {
+        Debug.Log(user.error);
+      }
+    } else {
+      Debug.Log(w.error);
+    }
+  }
+
+  public void JoinGame() {
     NetworkTransport.Init();
     ConnectionConfig cc = new ConnectionConfig();
 
