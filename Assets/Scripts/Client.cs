@@ -18,6 +18,12 @@ public class Player {
   public string playerName;
   public GameObject avatar;
   public int connectionId;
+  
+  public bool isLerpingPosition;
+  public Vector3 realPosition;
+  public Vector3 lastRealPosition;
+  public float timeStartedLerping;
+  public float timeToLerp;
 }
 
 public class Client : MonoBehaviour {
@@ -44,6 +50,9 @@ public class Client : MonoBehaviour {
 
   private WWWForm form;
   private string loginEndpoint = "login.php";
+
+  public float timeBetweenMovementStart;
+  public float timeBetweenMovementEnd;
 
   public void Connect() {
     Debug.Log("Logging in...");
@@ -92,6 +101,7 @@ public class Client : MonoBehaviour {
     connectionId = NetworkTransport.Connect(hostId, NetworkSettings.ADDRESS, NetworkSettings.PORT, 0, out error);
 
     connectionTime = Time.time;
+    timeBetweenMovementStart = Time.time;
     isConnected = true;
   }
   
@@ -163,18 +173,30 @@ public class Client : MonoBehaviour {
         position.x = float.Parse(d[1]);
         position.y = float.Parse(d[2]);
         position.z = float.Parse(d[3]);
-        players[int.Parse(d[0])].avatar.transform.position = position;
+
+        players[int.Parse(d[0])].lastRealPosition = players[int.Parse(d[0])].realPosition;
+        players[int.Parse(d[0])].realPosition = position;
+        players[int.Parse(d[0])].timeToLerp = float.Parse(d[4]);
+        if (players[int.Parse(d[0])].realPosition != players[int.Parse(d[0])].avatar.transform.position) {
+          players[int.Parse(d[0])].isLerpingPosition = true;
+        }
+        players[int.Parse(d[0])].timeStartedLerping = Time.time;
+        
+//        players[int.Parse(d[0])].avatar.transform.position = position;
       }
     }
     
     // Send our own position
     Vector3 myPosition = players[ourClientId].avatar.transform.position;
-    string m = "MYPOSITION|" + myPosition.x.ToString() + '|' + myPosition.y.ToString() + '|' + myPosition.z.ToString();
+    timeBetweenMovementEnd = Time.time;
+    string m = "MYPOSITION|" + myPosition.x.ToString() + '|' + myPosition.y.ToString() + '|' + myPosition.z.ToString() + '|' + (timeBetweenMovementEnd - timeBetweenMovementStart).ToString();
     Send(m, unreliableChannel);
+    timeBetweenMovementStart = Time.time;
   }
 
   private void SpawnPlayer(string playerName, int cnnId) {
     GameObject go = Instantiate(playerPrefab) as GameObject;
+    Player p = new Player();
     
     // Is this ours?
     if (cnnId == ourClientId) {
@@ -184,10 +206,11 @@ public class Client : MonoBehaviour {
       isStarted = true;
     }
     
-    Player p = new Player();
     p.avatar = go;
     p.playerName = playerName;
     p.connectionId = cnnId;
+    p.isLerpingPosition = false;
+    p.realPosition = p.avatar.transform.position;
     p.avatar.GetComponentInChildren<TextMesh>().text = playerName;
     players.Add(cnnId, p);
   }
@@ -201,5 +224,21 @@ public class Client : MonoBehaviour {
     Debug.Log("Sending : " + message);
     byte[] msg = Encoding.Unicode.GetBytes(message);
     NetworkTransport.Send(hostId, connectionId, channelId, msg, message.Length * sizeof(char), out error);
+  }
+  
+  private void FixedUpdate() {
+    NetworkLerp();
+  }
+
+  private void NetworkLerp() {
+    foreach(KeyValuePair<int, Player> player in players)
+    {
+      if (player.Value.playerName != playerName && player.Value.isLerpingPosition) {
+        Debug.Log(player.Value.playerName + " is lerping!");
+        float lerpPercentage = (Time.time - player.Value.timeStartedLerping) / player.Value.timeToLerp;
+
+        player.Value.avatar.transform.position = Vector3.Lerp(player.Value.lastRealPosition, player.Value.realPosition, lerpPercentage);
+      }
+    }
   }
 }
