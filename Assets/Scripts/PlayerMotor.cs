@@ -1,33 +1,44 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
 public class PlayerMotor : MonoBehaviour {
-  private CharacterController controller;
-  private float verticalVelocity;
+  
+  public float speed = 6.0f;
+  public float jumpSpeed = 8.0f;
+  public float gravity = 20.0f;
 
-  private void Start() {
+  private Vector3 moveDirection = Vector3.zero;
+  private CharacterController controller;
+
+  void Start()
+  {
     controller = GetComponent<CharacterController>();
+
+    // let the gameObject fall down
+    gameObject.transform.position = new Vector3(0, 5, 0);
   }
 
-  private void Update() {
-    Vector3 inputs = Vector3.zero;
+  void Update()
+  {
+    if (controller.isGrounded)
+    {
+      // We are grounded, so recalculate
+      // move direction directly from axes
 
-    inputs.x = Input.GetAxis("Horizontal");
-    inputs.z = Input.GetAxis("Vertical");
+      moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0.0f, Input.GetAxis("Vertical"));
+      moveDirection = transform.TransformDirection(moveDirection);
+      moveDirection = moveDirection * speed;
 
-    if (controller.isGrounded) {
-      verticalVelocity = -1;
-
-      if (Input.GetButton("Jump")) {
-        verticalVelocity = 10;
+      if (Input.GetButton("Jump"))
+      {
+        moveDirection.y = jumpSpeed;
       }
-    } else {
-      verticalVelocity -= 14.0f * Time.deltaTime;
     }
 
-    inputs.y = verticalVelocity;
+    // Apply gravity
+    moveDirection.y = moveDirection.y - (gravity * Time.deltaTime);
 
-    controller.Move(inputs * Time.deltaTime);
+    // Move the controller
+    controller.Move(moveDirection * Time.deltaTime);
   }
 }
