@@ -142,6 +142,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 1005643842152210, guid: f15f20435dc314722a149f535ba585f5,
     type: 2}
+  timeBetweenMovementStart: 0
+  timeBetweenMovementEnd: 0
 --- !u!4 &41972644
 Transform:
   m_ObjectHideFlags: 0
