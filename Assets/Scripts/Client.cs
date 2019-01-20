@@ -6,18 +6,14 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using System;
 
-// This user class defines a networked player and contains data on their connection.
 [Serializable]
 public class User {
   public bool success;
   public string error;
-
   public string username;
   // Add username, etc....
 }
 
-// This player class defines a player character that each client keeps a list of (as well as the server).
-// This is where each players physical gameobject is referenced.
 public class Player {
   public string playerName;
   public GameObject avatar;
@@ -62,6 +58,7 @@ public class Client : MonoBehaviour {
   public float timeBetweenMovementEnd;
 
   public void Connect() {
+    Debug.Log("Logging in...");
     StartCoroutine("RequestLogin");
   }
 
@@ -82,6 +79,7 @@ public class Client : MonoBehaviour {
         if (user.error != "") {
           Debug.Log(user.error);
         } else {
+          Debug.Log("Login successful");
           playerName = user.username;
           JoinGame();
         }
@@ -110,25 +108,7 @@ public class Client : MonoBehaviour {
     isConnected = true;
   }
 
-  public void JoinOfflineGame() {
-    playerName = GameObject.Find("UsernameOptionalInput").GetComponent<InputField>().text;
-    ourClientId = -1;
-    SpawnPlayer(playerName, ourClientId);
-  }
-
   private void Update() {
-    if (Application.isEditor && isStarted) {
-      if (Input.GetKeyDown(KeyCode.I)) {
-        ToggleCamera();
-      }
-      if (Input.GetKeyDown(KeyCode.O)) {
-        ToggleMovement();
-      }
-      if (Input.GetKeyDown(KeyCode.P)) {
-        ToggleAttacks();
-      }
-    }
-
     if (!isConnected) {
       return;
     }
@@ -145,6 +125,7 @@ public class Client : MonoBehaviour {
     switch (recData) {
       case NetworkEventType.DataEvent:
         string msg = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
+        Debug.Log("Receiving : " + msg);
         string[] splitData = msg.Split('|');
         switch (splitData[0]) {
           case "ASKNAME":
@@ -158,9 +139,6 @@ public class Client : MonoBehaviour {
             break;
           case "ASKPOSITION":
             OnAskPosition(splitData);
-            break;
-          case "ATK":
-            OnAttack(int.Parse(splitData[1]), splitData[2]);
             break;
           default:
             Debug.Log("Invalid message : " + msg);
@@ -237,14 +215,6 @@ public class Client : MonoBehaviour {
     timeBetweenMovementStart = Time.time;
   }
 
-  private void OnAttack(int cnnId, string time) {
-    float timeToReceive = Time.time - float.Parse(time);
-    if (cnnId != ourClientId) {
-      Debug.Log("Received message for client " + cnnId + " to attack after time " + timeToReceive);
-      players[cnnId].avatar.transform.Find("Arms").GetComponent<PlayerSwing>().Attack();
-    }
-  }
-
   private void SpawnPlayer(string playerName, int cnnId) {
     GameObject go = Instantiate(Resources.Load("Player")) as GameObject;
     Player p = new Player();
@@ -253,25 +223,16 @@ public class Client : MonoBehaviour {
     if (cnnId == ourClientId) {
       Destroy(go.transform.Find("Glasses").gameObject);
       Destroy(go.transform.Find("NameTag").gameObject);
+      Destroy(go.transform.Find("LeftArm").gameObject);
+      Destroy(go.transform.Find("RightArm").gameObject);
       go.AddComponent<PlayerMotor>();
       go.AddComponent<PlayerLook>();
-      go.tag = "Player";
-      GameObject obj = go.transform.Find("Arms").gameObject;
-      obj.AddComponent<Camera>();
-      obj.AddComponent<AudioListener>();
-      obj.AddComponent<CameraLook>();
-      obj.AddComponent<PlayerAttackController>();
+      GameObject obj = Instantiate(Resources.Load("PlayerCamera")) as GameObject;
+      obj.transform.parent = go.transform;
       GameObject.Find("Canvas").SetActive(false);
-      if (Application.isEditor) {
-        Instantiate(Resources.Load("DevCanvas"));
-      }
-      GameObject.Find("LockCamera").GetComponent<Button>().onClick.AddListener(ToggleCamera);
-      GameObject.Find("LockMovement").GetComponent<Button>().onClick.AddListener(ToggleMovement);
-      GameObject.Find("LockAttacks").GetComponent<Button>().onClick.AddListener(ToggleAttacks);
       isStarted = true;
     }
 
-    go.name = playerName;
     p.avatar = go;
     p.playerName = playerName;
     p.connectionId = cnnId;
@@ -289,20 +250,9 @@ public class Client : MonoBehaviour {
   }
 
   private void Send(string message, int channelId) {
+    Debug.Log("Sending : " + message);
     byte[] msg = Encoding.Unicode.GetBytes(message);
     NetworkTransport.Send(hostId, connectionId, channelId, msg, message.Length * sizeof(char), out error);
-  }
-
-  public void SendReliable(string message) {
-    if (isConnected) {
-      Send(message, unreliableChannel);
-    }
-  }
-
-  public void SendUnreliable(string message) {
-    if (isConnected) {
-      Send(message, reliableChannel);
-    }
   }
 
   private void FixedUpdate() {
@@ -326,52 +276,6 @@ public class Client : MonoBehaviour {
             Quaternion.Lerp(player.Value.lastRealRotation, player.Value.realRotation, lerpPercentage);
         }
       }
-    }
-  }
-
-  public void ToggleCamera() {
-    if (players[ourClientId].avatar.GetComponent<PlayerLook>().isActiveAndEnabled) {
-      players[ourClientId].avatar.GetComponent<PlayerLook>().enabled = false;
-      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Unlock Camera";
-    } else {
-      players[ourClientId].avatar.GetComponent<PlayerLook>().enabled = true;
-      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Lock Camera";
-    }
-
-    if (players[ourClientId].avatar.GetComponentInChildren<CameraLook>().isActiveAndEnabled) {
-      players[ourClientId].avatar.GetComponentInChildren<CameraLook>().enabled = false;
-      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Unlock Camera";
-    } else {
-      players[ourClientId].avatar.GetComponentInChildren<CameraLook>().enabled = true;
-      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Lock Camera";
-    }
-  }
-
-  public void ToggleMovement() {
-    if (players[ourClientId].avatar.GetComponent<PlayerMotor>().isActiveAndEnabled) {
-      players[ourClientId].avatar.GetComponent<PlayerMotor>().enabled = false;
-      GameObject.Find("LockMovement").GetComponentInChildren<Text>().text = "(o) Unlock Movement";
-    } else {
-      players[ourClientId].avatar.GetComponent<PlayerMotor>().enabled = true;
-      GameObject.Find("LockMovement").GetComponentInChildren<Text>().text = "(o) Lock Movement";
-    }
-  }
-
-  public void ToggleAttacks() {
-    if (players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().isActiveAndEnabled) {
-      players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().enabled = false;
-      GameObject.Find("LockAttacks").GetComponentInChildren<Text>().text = "(p) Unlock Attacks";
-    } else {
-      players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().enabled = true;
-      GameObject.Find("LockAttacks").GetComponentInChildren<Text>().text = "(p) Lock Attacks";
-    }
-
-    if (players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().isActiveAndEnabled) {
-      players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().enabled = false;
-      GameObject.Find("LockAttacks").GetComponentInChildren<Text>().text = "(p) Unlock Attacks";
-    } else {
-      players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().enabled = true;
-      GameObject.Find("LockAttacks").GetComponentInChildren<Text>().text = "(p) Lock Attacks";
     }
   }
 }
