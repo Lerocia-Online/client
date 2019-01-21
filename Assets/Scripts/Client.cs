@@ -57,7 +57,12 @@ public class Client : MonoBehaviour {
   public float timeBetweenMovementStart;
   public float timeBetweenMovementEnd;
 
+  private Text errorText;
+  private bool isDeveloper = false;
+
   public void Connect() {
+    errorText = GameObject.Find("ErrorText").GetComponent<Text>();
+    errorText.text = "Logging in...";
     Debug.Log("Logging in...");
     StartCoroutine("RequestLogin");
   }
@@ -77,16 +82,20 @@ public class Client : MonoBehaviour {
       User user = JsonUtility.FromJson<User>(w.text);
       if (user.success) {
         if (user.error != "") {
+          errorText.text = user.error;
           Debug.Log(user.error);
         } else {
+          errorText.text = "Login successful";
           Debug.Log("Login successful");
           playerName = user.username;
           JoinGame();
         }
       } else {
+        errorText.text = user.error;
         Debug.Log(user.error);
       }
     } else {
+      errorText.text = w.error;
       Debug.Log(w.error);
     }
   }
@@ -107,8 +116,32 @@ public class Client : MonoBehaviour {
     timeBetweenMovementStart = Time.time;
     isConnected = true;
   }
+  
+  public void JoinOfflineGame() {
+    playerName = GameObject.Find("UsernameOptionalInput").GetComponent<InputField>().text;
+    ourClientId = -1;
+    SpawnPlayer(playerName, ourClientId);
+  }
+
+  private void Start() {
+    if (Application.isEditor) {
+      isDeveloper = true;
+    }
+  }
 
   private void Update() {
+    if (isDeveloper && isStarted) {
+      if (Input.GetKeyDown(KeyCode.I)) {
+        ToggleCamera();
+      }
+      if (Input.GetKeyDown(KeyCode.O)) {
+        ToggleMovement();
+      }
+      if (Input.GetKeyDown(KeyCode.P)) {
+        ToggleAttacks();
+      }
+    }
+
     if (!isConnected) {
       return;
     }
@@ -242,6 +275,12 @@ public class Client : MonoBehaviour {
       obj.AddComponent<PlayerAttackController>();
       obj.transform.parent = go.transform;
       GameObject.Find("Canvas").SetActive(false);
+      if (isDeveloper) {
+        Instantiate(Resources.Load("DevCanvas"));
+        GameObject.Find("LockCamera").GetComponent<Button>().onClick.AddListener(ToggleCamera);
+        GameObject.Find("LockMovement").GetComponent<Button>().onClick.AddListener(ToggleMovement);
+        GameObject.Find("LockAttacks").GetComponent<Button>().onClick.AddListener(ToggleAttacks);
+      }
       isStarted = true;
     }
 
@@ -269,7 +308,9 @@ public class Client : MonoBehaviour {
   }
 
   public void SendReliable(string message) {
-    Send(message, reliableChannel);
+    if (isConnected) {
+      Send(message, reliableChannel);
+    }
   }
 
   private void FixedUpdate() {
@@ -293,6 +334,52 @@ public class Client : MonoBehaviour {
             Quaternion.Lerp(player.Value.lastRealRotation, player.Value.realRotation, lerpPercentage);
         }
       }
+    }
+  }
+  
+  public void ToggleCamera() {
+    if (players[ourClientId].avatar.GetComponent<PlayerLook>().isActiveAndEnabled) {
+      players[ourClientId].avatar.GetComponent<PlayerLook>().enabled = false;
+      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Unlock Camera";
+    } else {
+      players[ourClientId].avatar.GetComponent<PlayerLook>().enabled = true;
+      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Lock Camera";
+    }
+
+    if (players[ourClientId].avatar.GetComponentInChildren<CameraLook>().isActiveAndEnabled) {
+      players[ourClientId].avatar.GetComponentInChildren<CameraLook>().enabled = false;
+      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Unlock Camera";
+    } else {
+      players[ourClientId].avatar.GetComponentInChildren<CameraLook>().enabled = true;
+      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Lock Camera";
+    }
+  }
+
+  public void ToggleMovement() {
+    if (players[ourClientId].avatar.GetComponent<PlayerMotor>().isActiveAndEnabled) {
+      players[ourClientId].avatar.GetComponent<PlayerMotor>().enabled = false;
+      GameObject.Find("LockMovement").GetComponentInChildren<Text>().text = "(o) Unlock Movement";
+    } else {
+      players[ourClientId].avatar.GetComponent<PlayerMotor>().enabled = true;
+      GameObject.Find("LockMovement").GetComponentInChildren<Text>().text = "(o) Lock Movement";
+    }
+  }
+
+  public void ToggleAttacks() {
+    if (players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().isActiveAndEnabled) {
+      players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().enabled = false;
+      GameObject.Find("LockAttacks").GetComponentInChildren<Text>().text = "(p) Unlock Attacks";
+    } else {
+      players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().enabled = true;
+      GameObject.Find("LockAttacks").GetComponentInChildren<Text>().text = "(p) Lock Attacks";
+    }
+
+    if (players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().isActiveAndEnabled) {
+      players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().enabled = false;
+      GameObject.Find("LockAttacks").GetComponentInChildren<Text>().text = "(p) Unlock Attacks";
+    } else {
+      players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().enabled = true;
+      GameObject.Find("LockAttacks").GetComponentInChildren<Text>().text = "(p) Lock Attacks";
     }
   }
 }
