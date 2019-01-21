@@ -5,6 +5,6 @@ using UnityEngine;
 public class NameTagController : MonoBehaviour {
   void Update() {
     // Rotate the camera every frame so it keeps looking at the target
-    transform.LookAt(GameObject.Find("PlayerCamera(Clone)").transform);
+    transform.LookAt(GameObject.FindGameObjectWithTag("Player").transform);
   }
 }

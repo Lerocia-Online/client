@@ -140,6 +140,9 @@ public class Client : MonoBehaviour {
           case "ASKPOSITION":
             OnAskPosition(splitData);
             break;
+          case "ATK":
+            OnAttack(int.Parse(splitData[1]));
+            break;
           default:
             Debug.Log("Invalid message : " + msg);
             break;
@@ -214,6 +217,12 @@ public class Client : MonoBehaviour {
     Send(m, unreliableChannel);
     timeBetweenMovementStart = Time.time;
   }
+  
+  private void OnAttack(int cnnId) {
+    if (cnnId != ourClientId) {
+      players[cnnId].avatar.transform.Find("Arms").GetComponent<PlayerSwing>().Attack();
+    }
+  }
 
   private void SpawnPlayer(string playerName, int cnnId) {
     GameObject go = Instantiate(Resources.Load("Player")) as GameObject;
@@ -223,16 +232,20 @@ public class Client : MonoBehaviour {
     if (cnnId == ourClientId) {
       Destroy(go.transform.Find("Glasses").gameObject);
       Destroy(go.transform.Find("NameTag").gameObject);
-      Destroy(go.transform.Find("LeftArm").gameObject);
-      Destroy(go.transform.Find("RightArm").gameObject);
       go.AddComponent<PlayerMotor>();
       go.AddComponent<PlayerLook>();
-      GameObject obj = Instantiate(Resources.Load("PlayerCamera")) as GameObject;
+      go.tag = "Player";
+      GameObject obj = go.transform.Find("Arms").gameObject;
+      obj.AddComponent<Camera>();
+      obj.AddComponent<AudioListener>();
+      obj.AddComponent<CameraLook>();
+      obj.AddComponent<PlayerAttackController>();
       obj.transform.parent = go.transform;
       GameObject.Find("Canvas").SetActive(false);
       isStarted = true;
     }
 
+    go.name = playerName;
     p.avatar = go;
     p.playerName = playerName;
     p.connectionId = cnnId;
@@ -253,6 +266,10 @@ public class Client : MonoBehaviour {
     Debug.Log("Sending : " + message);
     byte[] msg = Encoding.Unicode.GetBytes(message);
     NetworkTransport.Send(hostId, connectionId, channelId, msg, message.Length * sizeof(char), out error);
+  }
+
+  public void SendReliable(string message) {
+    Send(message, reliableChannel);
   }
 
   private void FixedUpdate() {
