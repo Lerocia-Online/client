@@ -27,6 +27,9 @@ public class Player {
   public Quaternion lastRealRotation;
   public float timeStartedLerping;
   public float timeToLerp;
+
+  public int maxHealth;
+  public int currentHealth;
 }
 
 public class Client : MonoBehaviour {
@@ -260,11 +263,17 @@ public class Client : MonoBehaviour {
   private void SpawnPlayer(string playerName, int cnnId) {
     GameObject go = Instantiate(Resources.Load("Player")) as GameObject;
     Player p = new Player();
+    go.name = playerName;
+    p.avatar = go;
+    p.playerName = playerName;
+    p.connectionId = cnnId;
+    p.maxHealth = 100;
+    p.currentHealth = p.maxHealth;
 
     // Is this ours?
     if (cnnId == ourClientId) {
+      Destroy(go.transform.Find("PlayerCanvas").gameObject);
       Destroy(go.transform.Find("Glasses").gameObject);
-      Destroy(go.transform.Find("NameTag").gameObject);
       go.AddComponent<PlayerMotor>();
       go.AddComponent<PlayerLook>();
       go.tag = "Player";
@@ -281,18 +290,17 @@ public class Client : MonoBehaviour {
         GameObject.Find("LockMovement").GetComponent<Button>().onClick.AddListener(ToggleMovement);
         GameObject.Find("LockAttacks").GetComponent<Button>().onClick.AddListener(ToggleAttacks);
       }
+      Instantiate(Resources.Load("MyCanvas"));
+      GameObject.Find("MyCanvas(Clone)").transform.Find("HealthBar").GetComponent<Slider>().value = p.currentHealth;
       isStarted = true;
     }
 
-    go.name = playerName;
-    p.avatar = go;
-    p.playerName = playerName;
-    p.connectionId = cnnId;
     p.isLerpingPosition = false;
     p.isLerpingRotation = false;
     p.realPosition = p.avatar.transform.position;
     p.realRotation = p.avatar.transform.rotation;
-    p.avatar.GetComponentInChildren<TextMesh>().text = playerName;
+    p.avatar.transform.Find("PlayerCanvas").GetComponentInChildren<Text>().text = playerName;
+    p.avatar.transform.Find("PlayerCanvas").GetComponentInChildren<Slider>().value = p.currentHealth;
     players.Add(cnnId, p);
   }
 
