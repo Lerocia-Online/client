@@ -41,7 +41,7 @@ public class Client : MonoBehaviour {
   private int reliableChannel;
   private int unreliableChannel;
 
-  private int ourClientId;
+  public int ourClientId;
   private int connectionId;
 
   private float connectionTime;
@@ -161,7 +161,7 @@ public class Client : MonoBehaviour {
     switch (recData) {
       case NetworkEventType.DataEvent:
         string msg = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
-        Debug.Log("Receiving : " + msg);
+//        Debug.Log("Receiving : " + msg);
         string[] splitData = msg.Split('|');
         switch (splitData[0]) {
           case "ASKNAME":
@@ -178,6 +178,9 @@ public class Client : MonoBehaviour {
             break;
           case "ATK":
             OnAttack(int.Parse(splitData[1]));
+            break;
+          case "HIT":
+            OnHit(int.Parse(splitData[1]), int.Parse(splitData[2]), int.Parse(splitData[3]));
             break;
           default:
             Debug.Log("Invalid message : " + msg);
@@ -259,11 +262,16 @@ public class Client : MonoBehaviour {
       players[cnnId].avatar.transform.Find("Arms").GetComponent<PlayerSwing>().Attack();
     }
   }
+  
+  private void OnHit(int cnnId, int hitId, int damage) {
+    players[hitId].avatar.GetComponent<PlayerController>().TakeDamage(damage);
+  }
 
   private void SpawnPlayer(string playerName, int cnnId) {
     GameObject go = Instantiate(Resources.Load("Player")) as GameObject;
     Player p = new Player();
     go.name = playerName;
+    go.GetComponent<PlayerController>().id = cnnId;
     p.avatar = go;
     p.playerName = playerName;
     p.connectionId = cnnId;
@@ -282,6 +290,7 @@ public class Client : MonoBehaviour {
       obj.AddComponent<AudioListener>();
       obj.AddComponent<CameraLook>();
       obj.AddComponent<PlayerAttackController>();
+      obj.AddComponent<PlayerAttack>();
       obj.transform.parent = go.transform;
       GameObject.Find("Canvas").SetActive(false);
       if (isDeveloper) {
@@ -310,7 +319,7 @@ public class Client : MonoBehaviour {
   }
 
   private void Send(string message, int channelId) {
-    Debug.Log("Sending : " + message);
+//    Debug.Log("Sending : " + message);
     byte[] msg = Encoding.Unicode.GetBytes(message);
     NetworkTransport.Send(hostId, connectionId, channelId, msg, message.Length * sizeof(char), out error);
   }
