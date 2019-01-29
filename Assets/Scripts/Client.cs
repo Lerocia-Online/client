@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using System;
+using UnityEditor;
 
 [Serializable]
 public class User {
@@ -63,10 +64,11 @@ public class Client : MonoBehaviour {
   private Text errorText;
   private bool isDeveloper = false;
 
+  public bool paused = false;
+
   public void Connect() {
     errorText = GameObject.Find("ErrorText").GetComponent<Text>();
     errorText.text = "Logging in...";
-    Debug.Log("Logging in...");
     StartCoroutine("RequestLogin");
   }
 
@@ -89,7 +91,6 @@ public class Client : MonoBehaviour {
           Debug.Log(user.error);
         } else {
           errorText.text = "Login successful";
-          Debug.Log("Login successful");
           playerName = user.username;
           JoinGame();
         }
@@ -133,15 +134,20 @@ public class Client : MonoBehaviour {
   }
 
   private void Update() {
-    if (isDeveloper && isStarted) {
-      if (Input.GetKeyDown(KeyCode.I)) {
-        ToggleCamera();
+    if (isStarted) {
+      if (Input.GetButtonDown("Cancel")) {
+        TogglePause();
       }
-      if (Input.GetKeyDown(KeyCode.O)) {
-        ToggleMovement();
-      }
-      if (Input.GetKeyDown(KeyCode.P)) {
-        ToggleAttacks();
+      if (isDeveloper) {
+        if (Input.GetKeyDown(KeyCode.I)) {
+          ToggleCamera();
+        }
+        if (Input.GetKeyDown(KeyCode.O)) {
+          ToggleMovement();
+        }
+        if (Input.GetKeyDown(KeyCode.P)) {
+          ToggleAttacks();
+        }
       }
     }
 
@@ -300,8 +306,13 @@ public class Client : MonoBehaviour {
         GameObject.Find("LockAttacks").GetComponent<Button>().onClick.AddListener(ToggleAttacks);
       }
       Instantiate(Resources.Load("MyCanvas"));
+      Instantiate(Resources.Load("PauseCanvas"));
+      GameObject.Find("QuitButton").GetComponent<Button>().onClick.AddListener(Quit);
+      GameObject.Find("PauseCanvas(Clone)").GetComponent<Canvas>().enabled = false;
       GameObject.Find("MyCanvas(Clone)").transform.Find("HealthBar").GetComponent<Slider>().value = p.currentHealth;
       isStarted = true;
+      Cursor.visible = false;
+      Cursor.lockState = CursorLockMode.Locked;
     }
 
     p.isLerpingPosition = false;
@@ -355,48 +366,96 @@ public class Client : MonoBehaviour {
   }
   
   public void ToggleCamera() {
-    if (players[ourClientId].avatar.GetComponent<PlayerLook>().isActiveAndEnabled) {
-      players[ourClientId].avatar.GetComponent<PlayerLook>().enabled = false;
-      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Unlock Camera";
+    if (players[ourClientId].avatar.GetComponent<PlayerLook>().isActiveAndEnabled && players[ourClientId].avatar.GetComponentInChildren<CameraLook>().isActiveAndEnabled) {
+      LockCamera();
     } else {
-      players[ourClientId].avatar.GetComponent<PlayerLook>().enabled = true;
-      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Lock Camera";
-    }
-
-    if (players[ourClientId].avatar.GetComponentInChildren<CameraLook>().isActiveAndEnabled) {
-      players[ourClientId].avatar.GetComponentInChildren<CameraLook>().enabled = false;
-      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Unlock Camera";
-    } else {
-      players[ourClientId].avatar.GetComponentInChildren<CameraLook>().enabled = true;
-      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Lock Camera";
+      UnlockCamera();
     }
   }
 
   public void ToggleMovement() {
     if (players[ourClientId].avatar.GetComponent<PlayerMotor>().isActiveAndEnabled) {
-      players[ourClientId].avatar.GetComponent<PlayerMotor>().enabled = false;
-      GameObject.Find("LockMovement").GetComponentInChildren<Text>().text = "(o) Unlock Movement";
+      LockMovement();
     } else {
-      players[ourClientId].avatar.GetComponent<PlayerMotor>().enabled = true;
-      GameObject.Find("LockMovement").GetComponentInChildren<Text>().text = "(o) Lock Movement";
+      UnlockMovement();
     }
   }
 
   public void ToggleAttacks() {
-    if (players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().isActiveAndEnabled) {
-      players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().enabled = false;
-      GameObject.Find("LockAttacks").GetComponentInChildren<Text>().text = "(p) Unlock Attacks";
+    if (players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().isActiveAndEnabled && players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().isActiveAndEnabled) {
+      LockAttacks();
     } else {
-      players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().enabled = true;
-      GameObject.Find("LockAttacks").GetComponentInChildren<Text>().text = "(p) Lock Attacks";
+      UnlockAttacks();
     }
+  }
 
-    if (players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().isActiveAndEnabled) {
-      players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().enabled = false;
+  private void LockCamera() {
+    players[ourClientId].avatar.GetComponent<PlayerLook>().enabled = false;
+    players[ourClientId].avatar.GetComponentInChildren<CameraLook>().enabled = false;
+    if (isDeveloper) {
+      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Unlock Camera";
+    }
+  }
+
+  private void LockMovement() {
+    players[ourClientId].avatar.GetComponent<PlayerMotor>().enabled = false;
+    if (isDeveloper) {
+      GameObject.Find("LockMovement").GetComponentInChildren<Text>().text = "(o) Unlock Movement";
+    }
+  }
+
+  private void LockAttacks() {
+    players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().enabled = false;
+    players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().enabled = false;
+    if (isDeveloper) {
       GameObject.Find("LockAttacks").GetComponentInChildren<Text>().text = "(p) Unlock Attacks";
-    } else {
-      players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().enabled = true;
+    }
+  }
+
+  private void UnlockCamera() {
+    players[ourClientId].avatar.GetComponent<PlayerLook>().enabled = true;
+    players[ourClientId].avatar.GetComponentInChildren<CameraLook>().enabled = true;
+    if (isDeveloper) {
+      GameObject.Find("LockCamera").GetComponentInChildren<Text>().text = "(i) Lock Camera";
+    }
+  }
+
+  private void UnlockMovement() {
+    players[ourClientId].avatar.GetComponent<PlayerMotor>().enabled = true;
+    if (isDeveloper) {
+      GameObject.Find("LockMovement").GetComponentInChildren<Text>().text = "(o) Lock Movement";
+    }
+  }
+
+  private void UnlockAttacks() {
+    players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().enabled = true;
+    players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().enabled = true;
+    if (isDeveloper) {
       GameObject.Find("LockAttacks").GetComponentInChildren<Text>().text = "(p) Lock Attacks";
     }
+  }
+
+  public void TogglePause() {
+    if (paused) {
+      paused = false;
+      GameObject.Find("PauseCanvas(Clone)").GetComponent<Canvas>().enabled = false;
+      Cursor.visible = false;
+      Cursor.lockState = CursorLockMode.Locked;
+      UnlockCamera();
+      UnlockMovement();
+      UnlockAttacks();
+    } else {
+      paused = true;
+      GameObject.Find("PauseCanvas(Clone)").GetComponent<Canvas>().enabled = true;
+      Cursor.visible = true;
+      Cursor.lockState = CursorLockMode.None;
+      LockCamera();
+      LockMovement();
+      LockAttacks();
+    }
+  }
+
+  public void Quit() {
+    Application.Quit();
   }
 }
