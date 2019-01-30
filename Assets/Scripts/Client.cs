@@ -283,7 +283,6 @@ public class Client : MonoBehaviour {
     p.connectionId = cnnId;
     p.maxHealth = 100;
     p.currentHealth = p.maxHealth;
-    go.tag = "Player";
 
     // Is this ours?
     if (cnnId == ourClientId) {

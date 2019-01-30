@@ -15,6 +15,21 @@ public class PlayerController : MonoBehaviour {
 
 	public void TakeDamage(int damage) {
 		client.players[id].currentHealth -= damage;
+		UpdateHealthBar();
+		if (client.players[id].currentHealth <= 0) {
+			KillPlayer();
+		}
+	}
+
+	private void KillPlayer() {
+		// Reset players health
+		client.players[id].currentHealth = client.players[id].maxHealth;
+		UpdateHealthBar();
+		// Move them back to "spawn" point
+		client.players[id].avatar.transform.position = new Vector3(0, 1, 0);
+	}
+
+	private void UpdateHealthBar() {
 		if (client.ourClientId == id) {
 			GameObject.Find("MyCanvas(Clone)").transform.Find("HealthBar").GetComponent<Slider>().value = client.players[id].currentHealth;
 		} else {
