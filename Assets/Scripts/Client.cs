@@ -182,6 +182,9 @@ public class Client : MonoBehaviour {
           case "ASKPOSITION":
             OnAskPosition(splitData);
             break;
+          case "CHARGE":
+            OnCharge(int.Parse(splitData[1]));
+            break;
           case "ATK":
             OnAttack(int.Parse(splitData[1]));
             break;
@@ -261,6 +264,12 @@ public class Client : MonoBehaviour {
                (timeBetweenMovementEnd - timeBetweenMovementStart).ToString();
     Send(m, unreliableChannel);
     timeBetweenMovementStart = Time.time;
+  }
+  
+  private void OnCharge(int cnnId) {
+    if (cnnId != ourClientId) {
+      players[cnnId].avatar.transform.Find("Arms").GetComponent<PlayerSwing>().Charge();
+    }
   }
   
   private void OnAttack(int cnnId) {
