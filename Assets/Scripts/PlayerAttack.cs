@@ -15,9 +15,9 @@ public class PlayerAttack : MonoBehaviour {
   public void Attack() {
     RaycastHit hit;
     if (Physics.Raycast(gameObject.transform.position, transform.forward, out hit, range)) {
-      client.SendReliable("HIT|" + hit.transform.gameObject.GetComponent<PlayerController>().id + "|" + damage);
-      Debug.Log(hit.transform.name);
-      hit.transform.gameObject.GetComponent<PlayerController>().TakeDamage(damage);
+      if (hit.transform.tag == "Player") {
+        client.SendReliable("HIT|" + hit.transform.gameObject.GetComponent<PlayerController>().id + "|" + damage);
+      }
     }
   }
 }

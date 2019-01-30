@@ -283,6 +283,7 @@ public class Client : MonoBehaviour {
     p.connectionId = cnnId;
     p.maxHealth = 100;
     p.currentHealth = p.maxHealth;
+    go.tag = "Player";
 
     // Is this ours?
     if (cnnId == ourClientId) {
@@ -290,7 +291,6 @@ public class Client : MonoBehaviour {
       Destroy(go.transform.Find("Glasses").gameObject);
       go.AddComponent<PlayerMotor>();
       go.AddComponent<PlayerLook>();
-      go.tag = "Player";
       GameObject obj = go.transform.Find("Arms").gameObject;
       obj.AddComponent<Camera>();
       obj.AddComponent<AudioListener>();
