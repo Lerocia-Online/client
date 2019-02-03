@@ -7,11 +7,37 @@ using UnityEngine.UI;
 using System;
 using UnityEditor;
 
+public static class JsonHelper {
+  public static T[] FromJson<T>(string json) {
+    Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
+    return wrapper.Items;
+  }
+
+  public static string ToJson<T>(T[] array) {
+    Wrapper<T> wrapper = new Wrapper<T>();
+    wrapper.Items = array;
+    return JsonUtility.ToJson(wrapper);
+  }
+
+  public static string ToJson<T>(T[] array, bool prettyPrint) {
+    Wrapper<T> wrapper = new Wrapper<T>();
+    wrapper.Items = array;
+    return JsonUtility.ToJson(wrapper, prettyPrint);
+  }
+
+  [Serializable]
+  private class Wrapper<T> {
+    public T[] Items;
+  }
+}
+
 [Serializable]
 public class User {
   public bool success;
   public string error;
   public string username;
+
+  public int user_id;
   // Add username, etc....
 }
 
@@ -31,6 +57,77 @@ public class Player {
 
   public int maxHealth;
   public int currentHealth;
+
+  public List<int> inventory;
+}
+
+public class Item {
+  protected string name;
+  protected int weight;
+  protected int value;
+
+  public string getName() {
+    return name;
+  }
+
+  public int getWeight() {
+    return weight;
+  }
+
+  public int getValue() {
+    return value;
+  }
+}
+
+[Serializable]
+public class DatabaseItem {
+  public int item_id;
+  public int amount;
+}
+
+public class Potion : Item {
+  private string description;
+
+  public Potion(string name, int weight, int value, string description) {
+    this.name = name;
+    this.weight = weight;
+    this.value = value;
+    this.description = description;
+  }
+
+  public string getDescription() {
+    return description;
+  }
+}
+
+public class Weapon : Item {
+  private int damage;
+
+  public Weapon(string name, int weight, int value, int damage) {
+    this.name = name;
+    this.weight = weight;
+    this.value = value;
+    this.damage = damage;
+  }
+
+  public int getDamage() {
+    return damage;
+  }
+}
+
+public class Apparel : Item {
+  private int armor;
+
+  public Apparel(string name, int weight, int value, int armor) {
+    this.name = name;
+    this.weight = weight;
+    this.value = value;
+    this.armor = armor;
+  }
+
+  public int getArmor() {
+    return armor;
+  }
 }
 
 public class Client : MonoBehaviour {
@@ -51,20 +148,45 @@ public class Client : MonoBehaviour {
   private byte error;
 
   private string playerName;
+  private int playerId;
 
   public GameObject playerPrefab;
   public Dictionary<int, Player> players = new Dictionary<int, Player>();
 
   private WWWForm form;
   private string loginEndpoint = "login.php";
+  private string get_items_for_user_endpoint = "get_items_for_user.php";
 
   public float timeBetweenMovementStart;
   public float timeBetweenMovementEnd;
 
   private Text errorText;
   private bool isDeveloper = false;
+  public GameObject devCanvasPrefab;
 
   public bool paused = false;
+  public bool inMenu = false;
+
+  public List<Item> items = new List<Item> {
+    new Potion(
+      "some health potion",
+      1,
+      10,
+      "heals some amount"
+    ),
+    new Weapon(
+      "some sword weapon",
+      10,
+      50,
+      5
+    ),
+    new Apparel(
+      "some helmet apparel",
+      5,
+      10,
+      10
+    )
+  };
 
   public void Connect() {
     errorText = GameObject.Find("ErrorText").GetComponent<Text>();
@@ -92,6 +214,7 @@ public class Client : MonoBehaviour {
         } else {
           errorText.text = "Login successful";
           playerName = user.username;
+          playerId = user.user_id;
           JoinGame();
         }
       } else {
@@ -102,6 +225,31 @@ public class Client : MonoBehaviour {
       errorText.text = w.error;
       Debug.Log(w.error);
     }
+  }
+
+  public IEnumerator GetItemsForUser(int[] ids) {
+    form = new WWWForm();
+    form.AddField("user_id", ids[0]);
+
+    WWW w = new WWW(NetworkSettings.API + get_items_for_user_endpoint, form);
+    yield return w;
+
+    if (string.IsNullOrEmpty(w.error)) {
+      string jsonString = fixJson(w.text);
+      DatabaseItem[] dbi = JsonHelper.FromJson<DatabaseItem>(jsonString);
+      foreach (DatabaseItem it in dbi) {
+        for (int i = 0; i < it.amount; i++) {
+          players[ids[1]].inventory.Add(it.item_id);
+        }
+      }
+    } else {
+      Debug.Log(w.error);
+    }
+  }
+
+  string fixJson(string value) {
+    value = "{\"Items\":" + value + "}";
+    return value;
   }
 
   public void JoinGame() {
@@ -120,7 +268,7 @@ public class Client : MonoBehaviour {
     timeBetweenMovementStart = Time.time;
     isConnected = true;
   }
-  
+
   public void JoinOfflineGame() {
     playerName = GameObject.Find("UsernameOptionalInput").GetComponent<InputField>().text;
     ourClientId = -1;
@@ -131,20 +279,30 @@ public class Client : MonoBehaviour {
     if (Application.isEditor) {
       isDeveloper = true;
     }
+
+    GameObject.Find("PauseCanvas").GetComponent<Canvas>().enabled = false;
+    GameObject.Find("MenuCanvas").GetComponent<Canvas>().enabled = false;
   }
 
   private void Update() {
     if (isStarted) {
-      if (Input.GetButtonDown("Cancel")) {
+      if (Input.GetButtonDown("Cancel") && !inMenu) {
         TogglePause();
       }
-      if (isDeveloper) {
+
+      if (Input.GetKeyDown(KeyCode.F) && !paused) {
+        ToggleMenu();
+      }
+
+      if (isDeveloper && !paused && !inMenu) {
         if (Input.GetKeyDown(KeyCode.I)) {
           ToggleCamera();
         }
+
         if (Input.GetKeyDown(KeyCode.O)) {
           ToggleMovement();
         }
+
         if (Input.GetKeyDown(KeyCode.P)) {
           ToggleAttacks();
         }
@@ -265,33 +423,34 @@ public class Client : MonoBehaviour {
     Send(m, unreliableChannel);
     timeBetweenMovementStart = Time.time;
   }
-  
+
   private void OnCharge(int cnnId) {
     if (cnnId != ourClientId) {
       players[cnnId].avatar.transform.Find("Arms").GetComponent<PlayerSwing>().Charge();
     }
   }
-  
+
   private void OnAttack(int cnnId) {
     if (cnnId != ourClientId) {
       players[cnnId].avatar.transform.Find("Arms").GetComponent<PlayerSwing>().Attack();
     }
   }
-  
+
   private void OnHit(int cnnId, int hitId, int damage) {
     players[hitId].avatar.GetComponent<PlayerController>().TakeDamage(damage);
   }
 
   private void SpawnPlayer(string playerName, int cnnId) {
-    GameObject go = Instantiate(Resources.Load("Player")) as GameObject;
+    GameObject go = Instantiate(playerPrefab);
     Player p = new Player();
     go.name = playerName;
     go.GetComponent<PlayerController>().id = cnnId;
     p.avatar = go;
     p.playerName = playerName;
-    p.connectionId = cnnId;
+    p.connectionId = playerId;
     p.maxHealth = 100;
     p.currentHealth = p.maxHealth;
+    p.inventory = new List<int>();
 
     // Is this ours?
     if (cnnId == ourClientId) {
@@ -308,16 +467,14 @@ public class Client : MonoBehaviour {
       obj.transform.parent = go.transform;
       GameObject.Find("Canvas").SetActive(false);
       if (isDeveloper) {
-        Instantiate(Resources.Load("DevCanvas"));
+        Instantiate(devCanvasPrefab);
         GameObject.Find("LockCamera").GetComponent<Button>().onClick.AddListener(ToggleCamera);
         GameObject.Find("LockMovement").GetComponent<Button>().onClick.AddListener(ToggleMovement);
         GameObject.Find("LockAttacks").GetComponent<Button>().onClick.AddListener(ToggleAttacks);
       }
-      Instantiate(Resources.Load("MyCanvas"));
-      Instantiate(Resources.Load("PauseCanvas"));
+
       GameObject.Find("QuitButton").GetComponent<Button>().onClick.AddListener(Quit);
-      GameObject.Find("PauseCanvas(Clone)").GetComponent<Canvas>().enabled = false;
-      GameObject.Find("MyCanvas(Clone)").transform.Find("HealthBar").GetComponent<Slider>().value = p.currentHealth;
+      GameObject.Find("MyCanvas").transform.Find("HealthBar").GetComponent<Slider>().value = p.currentHealth;
       isStarted = true;
       Cursor.visible = false;
       Cursor.lockState = CursorLockMode.Locked;
@@ -330,6 +487,8 @@ public class Client : MonoBehaviour {
     p.avatar.transform.Find("PlayerCanvas").GetComponentInChildren<Text>().text = playerName;
     p.avatar.transform.Find("PlayerCanvas").GetComponentInChildren<Slider>().value = p.currentHealth;
     players.Add(cnnId, p);
+    int[] myArgs = {p.connectionId, cnnId};
+    StartCoroutine("GetItemsForUser", myArgs);
   }
 
   private void PlayerDisconnected(int cnnId) {
@@ -372,9 +531,10 @@ public class Client : MonoBehaviour {
       }
     }
   }
-  
+
   public void ToggleCamera() {
-    if (players[ourClientId].avatar.GetComponent<PlayerLook>().isActiveAndEnabled && players[ourClientId].avatar.GetComponentInChildren<CameraLook>().isActiveAndEnabled) {
+    if (players[ourClientId].avatar.GetComponent<PlayerLook>().isActiveAndEnabled &&
+        players[ourClientId].avatar.GetComponentInChildren<CameraLook>().isActiveAndEnabled) {
       LockCamera();
     } else {
       UnlockCamera();
@@ -390,7 +550,8 @@ public class Client : MonoBehaviour {
   }
 
   public void ToggleAttacks() {
-    if (players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().isActiveAndEnabled && players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().isActiveAndEnabled) {
+    if (players[ourClientId].avatar.GetComponentInChildren<PlayerAttackController>().isActiveAndEnabled &&
+        players[ourClientId].avatar.GetComponentInChildren<PlayerSwing>().isActiveAndEnabled) {
       LockAttacks();
     } else {
       UnlockAttacks();
@@ -446,20 +607,62 @@ public class Client : MonoBehaviour {
   public void TogglePause() {
     if (paused) {
       paused = false;
-      GameObject.Find("PauseCanvas(Clone)").GetComponent<Canvas>().enabled = false;
+      if (isDeveloper) {
+        GameObject.Find("DevCanvas(Clone)").GetComponent<Canvas>().enabled = true;
+      }
+
+      GameObject.Find("PauseCanvas").GetComponent<Canvas>().enabled = false;
+      GameObject.Find("MyCanvas").GetComponent<Canvas>().enabled = true;
       Cursor.visible = false;
       Cursor.lockState = CursorLockMode.Locked;
       UnlockCamera();
       UnlockMovement();
       UnlockAttacks();
     } else {
+      if (isDeveloper) {
+        GameObject.Find("DevCanvas(Clone)").GetComponent<Canvas>().enabled = false;
+      }
+
       paused = true;
-      GameObject.Find("PauseCanvas(Clone)").GetComponent<Canvas>().enabled = true;
+      GameObject.Find("PauseCanvas").GetComponent<Canvas>().enabled = true;
+      GameObject.Find("MyCanvas").GetComponent<Canvas>().enabled = false;
       Cursor.visible = true;
       Cursor.lockState = CursorLockMode.None;
       LockCamera();
       LockMovement();
       LockAttacks();
+    }
+  }
+
+  public void ToggleMenu() {
+    if (inMenu) {
+      inMenu = false;
+      if (isDeveloper) {
+        GameObject.Find("DevCanvas(Clone)").GetComponent<Canvas>().enabled = true;
+      }
+
+      GameObject.Find("MenuCanvas").GetComponent<Canvas>().enabled = false;
+      GameObject.Find("MyCanvas").GetComponent<Canvas>().enabled = true;
+      Cursor.visible = false;
+      Cursor.lockState = CursorLockMode.Locked;
+      UnlockCamera();
+      UnlockMovement();
+      UnlockAttacks();
+      GameObject.Find("MenuCanvas").GetComponent<MenuController>().CloseMenu();
+    } else {
+      inMenu = true;
+      if (isDeveloper) {
+        GameObject.Find("DevCanvas(Clone)").GetComponent<Canvas>().enabled = false;
+      }
+
+      GameObject.Find("MenuCanvas").GetComponent<Canvas>().enabled = true;
+      GameObject.Find("MyCanvas").GetComponent<Canvas>().enabled = false;
+      Cursor.visible = true;
+      Cursor.lockState = CursorLockMode.None;
+      LockCamera();
+      LockMovement();
+      LockAttacks();
+      GameObject.Find("MenuCanvas").GetComponent<MenuController>().OpenMenu();
     }
   }
 
