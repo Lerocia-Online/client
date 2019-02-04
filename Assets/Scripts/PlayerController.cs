@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour {
 
 	private void UpdateHealthBar() {
 		if (client.ourClientId == id) {
-			GameObject.Find("MyCanvas(Clone)").transform.Find("HealthBar").GetComponent<Slider>().value = client.players[id].currentHealth;
+			GameObject.Find("MyCanvas").transform.Find("HealthBar").GetComponent<Slider>().value = client.players[id].currentHealth;
 		} else {
 			transform.Find("PlayerCanvas").GetComponentInChildren<Slider>().value = client.players[id].currentHealth;
 		}
