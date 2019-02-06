@@ -4,131 +4,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
-using System;
-using UnityEditor;
-
-public static class JsonHelper {
-  public static T[] FromJson<T>(string json) {
-    Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
-    return wrapper.Items;
-  }
-
-  public static string ToJson<T>(T[] array) {
-    Wrapper<T> wrapper = new Wrapper<T>();
-    wrapper.Items = array;
-    return JsonUtility.ToJson(wrapper);
-  }
-
-  public static string ToJson<T>(T[] array, bool prettyPrint) {
-    Wrapper<T> wrapper = new Wrapper<T>();
-    wrapper.Items = array;
-    return JsonUtility.ToJson(wrapper, prettyPrint);
-  }
-
-  [Serializable]
-  private class Wrapper<T> {
-    public T[] Items;
-  }
-}
-
-[Serializable]
-public class User {
-  public bool success;
-  public string error;
-  public string username;
-
-  public int user_id;
-  // Add username, etc....
-}
-
-public class Player {
-  public string playerName;
-  public GameObject avatar;
-  public int connectionId;
-
-  public bool isLerpingPosition;
-  public bool isLerpingRotation;
-  public Vector3 realPosition;
-  public Quaternion realRotation;
-  public Vector3 lastRealPosition;
-  public Quaternion lastRealRotation;
-  public float timeStartedLerping;
-  public float timeToLerp;
-
-  public int maxHealth;
-  public int currentHealth;
-
-  public List<int> inventory;
-}
-
-public class Item {
-  protected string name;
-  protected int weight;
-  protected int value;
-
-  public string getName() {
-    return name;
-  }
-
-  public int getWeight() {
-    return weight;
-  }
-
-  public int getValue() {
-    return value;
-  }
-}
-
-[Serializable]
-public class DatabaseItem {
-  public int item_id;
-  public int amount;
-}
-
-public class Potion : Item {
-  private string description;
-
-  public Potion(string name, int weight, int value, string description) {
-    this.name = name;
-    this.weight = weight;
-    this.value = value;
-    this.description = description;
-  }
-
-  public string getDescription() {
-    return description;
-  }
-}
-
-public class Weapon : Item {
-  private int damage;
-
-  public Weapon(string name, int weight, int value, int damage) {
-    this.name = name;
-    this.weight = weight;
-    this.value = value;
-    this.damage = damage;
-  }
-
-  public int getDamage() {
-    return damage;
-  }
-}
-
-public class Apparel : Item {
-  private int armor;
-
-  public Apparel(string name, int weight, int value, int armor) {
-    this.name = name;
-    this.weight = weight;
-    this.value = value;
-    this.armor = armor;
-  }
-
-  public int getArmor() {
-    return armor;
-  }
-}
 
 public class Client : MonoBehaviour {
   private const int MAX_CONNECTION = 100;
@@ -167,26 +42,7 @@ public class Client : MonoBehaviour {
   public bool paused = false;
   public bool inMenu = false;
 
-  public List<Item> items = new List<Item> {
-    new Potion(
-      "some health potion",
-      1,
-      10,
-      "heals some amount"
-    ),
-    new Weapon(
-      "some sword weapon",
-      10,
-      50,
-      5
-    ),
-    new Apparel(
-      "some helmet apparel",
-      5,
-      10,
-      10
-    )
-  };
+  public List<Item> items = new List<Item>();
 
   public void Connect() {
     errorText = GameObject.Find("ErrorText").GetComponent<Text>();
@@ -210,7 +66,6 @@ public class Client : MonoBehaviour {
       if (user.success) {
         if (user.error != "") {
           errorText.text = user.error;
-          Debug.Log(user.error);
         } else {
           errorText.text = "Login successful";
           playerName = user.username;
@@ -219,11 +74,9 @@ public class Client : MonoBehaviour {
         }
       } else {
         errorText.text = user.error;
-        Debug.Log(user.error);
       }
     } else {
       errorText.text = w.error;
-      Debug.Log(w.error);
     }
   }
 
@@ -235,7 +88,7 @@ public class Client : MonoBehaviour {
     yield return w;
 
     if (string.IsNullOrEmpty(w.error)) {
-      string jsonString = fixJson(w.text);
+      string jsonString = JsonHelper.fixJson(w.text);
       DatabaseItem[] dbi = JsonHelper.FromJson<DatabaseItem>(jsonString);
       foreach (DatabaseItem it in dbi) {
         for (int i = 0; i < it.amount; i++) {
@@ -245,11 +98,6 @@ public class Client : MonoBehaviour {
     } else {
       Debug.Log(w.error);
     }
-  }
-
-  string fixJson(string value) {
-    value = "{\"Items\":" + value + "}";
-    return value;
   }
 
   public void JoinGame() {
@@ -276,6 +124,29 @@ public class Client : MonoBehaviour {
   }
 
   private void Start() {
+    
+    items.Add(new HealthPotion(
+      items.Count,
+      "health potion",
+      1,
+      10,
+      20
+    ));
+    items.Add(new Weapon(
+      items.Count,
+      "sword",
+      10,
+      50,
+      5
+    ));
+    items.Add(new Apparel(
+      items.Count,
+      "helmet",
+      5,
+      10,
+      10
+    ));
+    
     if (Application.isEditor) {
       isDeveloper = true;
     }
@@ -348,6 +219,9 @@ public class Client : MonoBehaviour {
             break;
           case "HIT":
             OnHit(int.Parse(splitData[1]), int.Parse(splitData[2]), int.Parse(splitData[3]));
+            break;
+          case "USE":
+            OnUse(int.Parse(splitData[1]), int.Parse(splitData[2]));
             break;
           default:
             Debug.Log("Invalid message : " + msg);
@@ -439,18 +313,18 @@ public class Client : MonoBehaviour {
   private void OnHit(int cnnId, int hitId, int damage) {
     players[hitId].avatar.GetComponent<PlayerController>().TakeDamage(damage);
   }
+  
+  private void OnUse(int cnnId, int itemId) {
+    if (cnnId != ourClientId) {
+      items[itemId].Use(players[cnnId]);
+    }
+  }
 
   private void SpawnPlayer(string playerName, int cnnId) {
     GameObject go = Instantiate(playerPrefab);
-    Player p = new Player();
     go.name = playerName;
     go.GetComponent<PlayerController>().id = cnnId;
-    p.avatar = go;
-    p.playerName = playerName;
-    p.connectionId = playerId;
-    p.maxHealth = 100;
-    p.currentHealth = p.maxHealth;
-    p.inventory = new List<int>();
+    Player p = new Player(playerName, go, playerId, items);
 
     // Is this ours?
     if (cnnId == ourClientId) {

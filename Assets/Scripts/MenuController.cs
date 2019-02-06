@@ -11,6 +11,8 @@ public class MenuController : MonoBehaviour {
   public GameObject itemNamePrefab;
   public GameObject itemStatPrefab;
   public GameObject itemDescriptionPrefab;
+  private GameObject playerHealthBar;
+  private GameObject playerStaminaBar;
   private Client client;
   private Dictionary<GameObject, List<GameObject>> itemDictionary;
   private GameObject currentCategory;
@@ -43,6 +45,27 @@ public class MenuController : MonoBehaviour {
       } else if (Input.GetAxis("Horizontal") < 0) {
         MoveLeft();
       }
+
+      if (isItemView) {
+        if (Input.GetKeyDown(KeyCode.E)) {
+          UseItem();
+        } else if (Input.GetKeyDown(KeyCode.R)) {
+          DropItem();
+        }
+        GameObject playerPanel = transform.Find("Player Panel").gameObject;
+        playerPanel.transform.Find("Health Bar").GetComponent<Slider>().value =
+          client.players[client.ourClientId].currentHealth;
+        playerPanel.transform.Find("Stamina Bar").GetComponent<Slider>().value =
+          client.players[client.ourClientId].currentStamina;
+        playerPanel.transform.Find("Gold").transform.Find("Value").GetComponent<Text>().text =
+          client.players[client.ourClientId].gold.ToString();
+        playerPanel.transform.Find("Weight").transform.Find("Value").GetComponent<Text>().text =
+          client.players[client.ourClientId].weight.ToString();
+        playerPanel.transform.Find("Armor").transform.Find("Value").GetComponent<Text>().text =
+          client.players[client.ourClientId].armor.ToString();
+        playerPanel.transform.Find("Damage").transform.Find("Value").GetComponent<Text>().text =
+          client.players[client.ourClientId].damage.ToString();    
+      }
     }
   }
 
@@ -50,12 +73,13 @@ public class MenuController : MonoBehaviour {
     // Initialize dictionary of all items with key->value being category->items
     itemDictionary = new Dictionary<GameObject, List<GameObject>>();
     
+    // This list keeps track of the current index of each item list from category to category so location is persistent
     currentItemIndexes = new List<int>();
 
     // Initialize categories for each item in inventory
     List<string> distinctCategories = new List<string>();
     foreach (int item_id in client.players[client.ourClientId].inventory) {
-      distinctCategories.Add(client.items[item_id].GetType().Name);
+      distinctCategories.Add(client.items[item_id].getCategory());
     }
 
     // Remove all duplicate categories from list
@@ -79,15 +103,33 @@ public class MenuController : MonoBehaviour {
     foreach (GameObject category in categoryList) {
       nextPosition = Vector3.zero;
       itemDictionary[category] = new List<GameObject>();
+      Dictionary<int, int> uniqueItemDictionary = new Dictionary<int, int>();
       foreach (int item_id in client.players[client.ourClientId].inventory) {
-        if (client.items[item_id].GetType().Name == category.GetComponent<Text>().text) {
+        if (uniqueItemDictionary.ContainsKey(item_id)) {
+          uniqueItemDictionary[item_id]++;
+        } else {
+          uniqueItemDictionary.Add(item_id, 1);
+        }
+      }
+      foreach (KeyValuePair<int, int> item_id in uniqueItemDictionary) {
+        if (client.items[item_id.Key].getCategory() == category.GetComponent<Text>().text) {
           GameObject itemText = Instantiate(itemTextPrefab);
-          itemText.name = client.items[item_id].getName();
-          itemText.GetComponent<Text>().text = client.items[item_id].getName();
+          itemText.name = client.items[item_id.Key].getName();
+          itemText.GetComponent<Text>().text = client.items[item_id.Key].getName();
           itemText.transform.SetParent(transform.Find("Items Selector Panel"), false);
           itemText.transform.localPosition = nextPosition;
           nextPosition = new Vector3(0, nextPosition.y - itemText.GetComponent<RectTransform>().rect.height, 0);
-          itemText.GetComponent<ItemTextController>().id = item_id;
+          itemText.GetComponent<ItemTextController>().id = item_id.Key;
+          itemText.transform.Find("Amount").GetComponent<Text>().text =
+            "x" + item_id.Value;
+          if (client.players[client.ourClientId].weapon == item_id.Key || client.players[client.ourClientId].apparel == item_id.Key) {
+            itemText.transform.Find("Equipped").gameObject.SetActive(true);
+          } else {
+            itemText.transform.Find("Equipped").gameObject.SetActive(false);
+          }
+          if (itemDictionary[category].Contains(itemText)) {
+            Debug.Log("Found a duplicate");
+          }
           itemDictionary[category].Add(itemText);
         }
       }
@@ -167,10 +209,22 @@ public class MenuController : MonoBehaviour {
     }
   }
 
+  private void UseItem() {
+    client.SendReliable("USE|" + GetCurrentSelectedItem().getId());
+    GetCurrentSelectedItem().Use(client.players[client.ourClientId]);
+    RefreshMenu();
+  }
+
+  private void DropItem() {
+    GetCurrentSelectedItem().Drop(client.players[client.ourClientId]);
+    RefreshMenu();
+  }
+
   private void ToggleItemView(bool visible) {
     isItemView = visible;
     transform.Find("Items Selector Panel").gameObject.SetActive(visible);
     transform.Find("Item Panel").gameObject.SetActive(visible);
+    transform.Find("Player Panel").gameObject.SetActive(visible);
   }
 
   private void UpdateItemList() {
@@ -181,7 +235,7 @@ public class MenuController : MonoBehaviour {
 
     // hide items for old category
     foreach (GameObject item in itemDictionary[currentCategory]) {
-      item.GetComponent<Text>().enabled = false;
+      item.SetActive(false);
     }
     
     // switch category to current selected category
@@ -189,7 +243,7 @@ public class MenuController : MonoBehaviour {
     
     // show items for new category
     foreach (GameObject item in itemDictionary[currentCategory]) {
-      item.GetComponent<Text>().enabled = true;
+      item.SetActive(true);
     }
   }
 
@@ -203,49 +257,21 @@ public class MenuController : MonoBehaviour {
     Item item = GetCurrentSelectedItem();
     GameObject panel = transform.Find("Item Panel").gameObject;
 
-    GameObject image = Instantiate(itemImagePrefab);
-    image.transform.SetParent(panel.transform, false);
+    GameObject itemImage = Instantiate(itemImagePrefab);
+    itemImage.transform.SetParent(panel.transform, false);
+    //TODO set item image
 
-    GameObject name = Instantiate(itemNamePrefab);
-    name.transform.SetParent(panel.transform, false);
-    name.GetComponent<Text>().text = item.getName();
-    
-    GameObject weightStat = Instantiate(itemStatPrefab);
-    weightStat.transform.SetParent(panel.transform, false);
-    weightStat.transform.Find("Title").GetComponent<Text>().text = "Weight";
-    weightStat.transform.Find("Value").GetComponent<Text>().text = item.getWeight().ToString();
-    statList.Add(weightStat);
-    
-    GameObject valueStat = Instantiate(itemStatPrefab);
-    valueStat.transform.SetParent(panel.transform, false);
-    weightStat.transform.Find("Title").GetComponent<Text>().text = "Value";
-    valueStat.transform.Find("Value").GetComponent<Text>().text = item.getValue().ToString();
-    statList.Add(valueStat);
+    GameObject itemName = Instantiate(itemNamePrefab);
+    itemName.transform.SetParent(panel.transform, false);
+    itemName.GetComponent<Text>().text = item.getName();
 
-    // Get specific item type and update item view accordingly
-    switch (item.GetType().Name) {
-      case "Weapon":
-        Weapon weapon = item as Weapon;
-        GameObject damageStat = Instantiate(itemStatPrefab);
-        damageStat.transform.SetParent(panel.transform, false);
-        damageStat.transform.Find("Title").GetComponent<Text>().text = "Damage";
-        damageStat.transform.Find("Value").GetComponent<Text>().text = weapon.getDamage().ToString();
-        statList.Add(damageStat);
-        break;
-      case "Apparel":
-        Apparel apparel = item as Apparel;
-        GameObject armorStat = Instantiate(itemStatPrefab);
-        armorStat.transform.SetParent(panel.transform, false);
-        armorStat.transform.Find("Title").GetComponent<Text>().text = "Armor";
-        armorStat.transform.Find("Value").GetComponent<Text>().text = apparel.getArmor().ToString();
-        statList.Add(armorStat);
-        break;
-      case "Potion":
-        Potion potion = item as Potion;
-        GameObject description = Instantiate(itemDescriptionPrefab);
-        description.transform.SetParent(panel.transform, false);
-        description.GetComponent<Text>().text = potion.getDescription();
-        break;
+    // Create stat object in item view for each stat on this item
+    foreach (KeyValuePair<string, string> stat in item.getStats()) {
+      GameObject itemStat = Instantiate(itemStatPrefab);
+      itemStat.transform.SetParent(panel.transform, false);
+      itemStat.transform.Find("Title").GetComponent<Text>().text = stat.Key;
+      itemStat.transform.Find("Value").GetComponent<Text>().text = stat.Value;
+      statList.Add(itemStat);
     }
 
     // Set x position of each stat in the item view based on the number of stats to display
@@ -255,6 +281,13 @@ public class MenuController : MonoBehaviour {
       float offset = counter - (float)(statList.Count + 1) / 2;
       stat.transform.localPosition = new Vector3(width * offset, 0, 0);
       counter++;
+    }
+
+    // Only create a description text box if the item has a description
+    if (item.getDescription() != null) {
+      GameObject itemDescription = Instantiate(itemDescriptionPrefab);
+      itemDescription.transform.SetParent(panel.transform, false);
+      itemDescription.GetComponent<Text>().text = item.getDescription();
     }
   }
 
@@ -287,7 +320,23 @@ public class MenuController : MonoBehaviour {
   private void DisableAllItems() {
     foreach (List<GameObject> items in itemDictionary.Values) {
       foreach (GameObject item in items) {
-        item.GetComponent<Text>().enabled = false;
+        item.SetActive(false);
+      }
+    }
+  }
+
+  private void RefreshMenu() {
+    int categoryIndex = currentCategoryIndex;
+    List<int> itemIndexes = new List<int>(currentItemIndexes);
+    CloseMenu();
+    OpenMenu();
+    if (itemDictionary.Count > 0) {
+      for (int i = 0; i < categoryIndex; i++) {
+        MoveDown();
+      }
+      MoveRight();
+      for (int i = 0; i < itemIndexes[categoryIndex]; i++) {
+        MoveDown();
       }
     }
   }

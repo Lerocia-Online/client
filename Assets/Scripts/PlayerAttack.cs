@@ -16,8 +16,8 @@ public class PlayerAttack : MonoBehaviour {
     int damageBoost = Mathf.FloorToInt(chargeTime);
     RaycastHit hit;
     if (Physics.Raycast(gameObject.transform.position, transform.forward, out hit, range)) {
-      if (hit.transform.tag == "Player") {
-        client.SendReliable("HIT|" + hit.transform.gameObject.GetComponent<PlayerController>().id + "|" + (damage + damageBoost).ToString());
+      if (hit.transform.CompareTag("Player")) {
+        client.SendReliable("HIT|" + hit.transform.gameObject.GetComponent<PlayerController>().id + "|" + (client.players[client.ourClientId].damage + damage + damageBoost).ToString());
       }
     }
   }
