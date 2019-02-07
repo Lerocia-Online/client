@@ -23,6 +23,8 @@ public class Player {
 	public int currentHealth;
 	public int maxStamina;
 	public int currentStamina;
+	public Color defaultColor;
+	public Color currentColor;
 	public int gold;
 	public int weight;
 	public int armor;
@@ -43,6 +45,8 @@ public class Player {
 		currentHealth = maxHealth;
 		maxStamina = 100;
 		currentStamina = maxStamina;
+		defaultColor = Color.blue;
+		currentColor = defaultColor;
 		gold = 0;
 		weight = 0;
 		armor = 0;
@@ -58,6 +62,7 @@ public class Player {
 			Weapon weapon = items[this.weapon] as Weapon;
 			damage = weapon.getDamage();
 		} else {
+			currentColor = defaultColor;
 			damage = 0;
 		}
 

@@ -12,12 +12,16 @@ public class Weapon : Item {
 		return damage;
 	}
 
-	public override void Use(Player player) {
+	public void Equip(Player player) {
 		if (player.weapon != getId()) {
 			player.weapon = getId();
 		} else {
 			player.weapon = -1;
 		}
 		player.UpdateStats();
+	}
+
+	public override void Use(Player player) {
+		Equip(player);
 	}
 }

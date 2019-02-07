@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -42,7 +43,37 @@ public class Client : MonoBehaviour {
   public bool paused = false;
   public bool inMenu = false;
 
-  public List<Item> items = new List<Item>();
+  public List<Item> items = new List<Item> {
+    new HealthPotion(
+      0,
+      "health potion",
+      1,
+      10,
+      20
+    ),
+    new Weapon(
+      1,
+      "generic weapon",
+      10,
+      20,
+      15
+    ),
+    new Apparel(
+      2,
+      "generic armor",
+      5,
+      10,
+      10
+    ),
+    new ColorChangingWeapon(
+      3,
+      "Myers Knife",
+      0,
+      0,
+      100,
+      Color.red
+    )
+  };
 
   public void Connect() {
     errorText = GameObject.Find("ErrorText").GetComponent<Text>();
@@ -124,29 +155,6 @@ public class Client : MonoBehaviour {
   }
 
   private void Start() {
-    
-    items.Add(new HealthPotion(
-      items.Count,
-      "health potion",
-      1,
-      10,
-      20
-    ));
-    items.Add(new Weapon(
-      items.Count,
-      "sword",
-      10,
-      50,
-      5
-    ));
-    items.Add(new Apparel(
-      items.Count,
-      "helmet",
-      5,
-      10,
-      10
-    ));
-    
     if (Application.isEditor) {
       isDeveloper = true;
     }
@@ -313,7 +321,7 @@ public class Client : MonoBehaviour {
   private void OnHit(int cnnId, int hitId, int damage) {
     players[hitId].avatar.GetComponent<PlayerController>().TakeDamage(damage);
   }
-  
+
   private void OnUse(int cnnId, int itemId) {
     if (cnnId != ourClientId) {
       items[itemId].Use(players[cnnId]);

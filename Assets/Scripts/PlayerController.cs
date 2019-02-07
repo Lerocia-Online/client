@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour {
 		} else {
 			transform.Find("PlayerCanvas").GetComponentInChildren<Slider>().value = client.players[id].currentHealth;
 		}
+		GetComponent<Renderer>().material.color = client.players[id].currentColor;
 	}
 
 	public void TakeDamage(int damage) {
