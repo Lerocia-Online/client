@@ -120,8 +120,10 @@ public class MenuController : MonoBehaviour {
           itemText.transform.localPosition = nextPosition;
           nextPosition = new Vector3(0, nextPosition.y - itemText.GetComponent<RectTransform>().rect.height, 0);
           itemText.GetComponent<ItemTextController>().id = item_id.Key;
-          itemText.transform.Find("Amount").GetComponent<Text>().text =
-            "x" + item_id.Value;
+          if (item_id.Value > 1) {
+            itemText.GetComponent<Text>().text +=
+              " (" + item_id.Value + ")";
+          }
           if (client.players[client.ourClientId].weapon == item_id.Key || client.players[client.ourClientId].apparel == item_id.Key) {
             itemText.transform.Find("Equipped").gameObject.SetActive(true);
           } else {
@@ -216,6 +218,12 @@ public class MenuController : MonoBehaviour {
   }
 
   private void DropItem() {
+    GameObject item = new GameObject();
+    item.transform.position = client.players[client.ourClientId].avatar.transform.position;
+    item.transform.rotation = client.players[client.ourClientId].avatar.transform.rotation;
+    item.transform.position += item.transform.TransformDirection(Vector3.forward) * 2;
+    client.SendReliable("DROP|" + GetCurrentSelectedItem().getId() + "|" + item.transform.position.x + "|" + item.transform.position.y + "|" + item.transform.position.z);
+    Destroy(item);
     GetCurrentSelectedItem().Drop(client.players[client.ourClientId]);
     RefreshMenu();
   }
@@ -325,7 +333,7 @@ public class MenuController : MonoBehaviour {
     }
   }
 
-  private void RefreshMenu() {
+  public void RefreshMenu() {
     int categoryIndex = currentCategoryIndex;
     List<int> itemIndexes = new List<int>(currentItemIndexes);
     CloseMenu();
