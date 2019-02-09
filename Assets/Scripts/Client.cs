@@ -48,6 +48,8 @@ public class Client : MonoBehaviour {
   public bool paused = false;
   public bool inMenu = false;
 
+  private bool loggingIn = false;
+
   public List<Item> items = new List<Item> {
     new HealthPotion(
       0,
@@ -75,9 +77,12 @@ public class Client : MonoBehaviour {
   public Dictionary<int, GameObject> worldItems = new Dictionary<int, GameObject>();
 
   public void Connect() {
-    errorText = GameObject.Find("ErrorText").GetComponent<Text>();
-    errorText.text = "Logging in...";
-    StartCoroutine("RequestLogin");
+    if (!loggingIn) {
+      loggingIn = true;
+      errorText = GameObject.Find("ErrorText").GetComponent<Text>();
+      errorText.text = "Logging in...";
+      StartCoroutine("RequestLogin");
+    }
   }
 
   public IEnumerator RequestLogin() {
@@ -104,9 +109,11 @@ public class Client : MonoBehaviour {
         }
       } else {
         errorText.text = user.error;
+        loggingIn = false;
       }
     } else {
       errorText.text = w.error;
+      loggingIn = false;
     }
   }
 
@@ -396,8 +403,7 @@ public class Client : MonoBehaviour {
     p.avatar.transform.Find("PlayerCanvas").GetComponentInChildren<Text>().text = playerName;
     p.avatar.transform.Find("PlayerCanvas").GetComponentInChildren<Slider>().value = p.currentHealth;
     players.Add(cnnId, p);
-    int[] myArgs = {p.connectionId, cnnId};
-//    StartCoroutine("GetItemsForUser", myArgs);
+    loggingIn = false;
   }
 
   private void PlayerDisconnected(int cnnId) {
