@@ -1,7 +1,8 @@
 ﻿namespace Menus {
   using UnityEngine;
   using UnityStandardAssets.Characters.FirstPerson;
-  using Players;
+  using Characters;
+  using Characters.Players.Controllers;
   using Controllers;
 
   public static class CanvasSettings {
@@ -30,7 +31,7 @@
         if (InventoryMenu.activeSelf) {
           DeactivateMenu();
         } else {
-          ConnectedClients.MyPlayer.Avatar.GetComponent<FirstPersonController>().enabled = false;
+          ToggleControl(false);
           PlayerHud.SetActive(false);
           PauseMenu.SetActive(false);
           InventoryMenu.SetActive(true);
@@ -45,7 +46,7 @@
       } else {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-        ConnectedClients.MyPlayer.Avatar.GetComponent<FirstPersonController>().enabled = false;
+        ToggleControl(false);
         PlayerHud.SetActive(false);
         if (InventoryMenu.activeSelf) {
           InventoryMenuController.CloseMenu();
@@ -56,13 +57,18 @@
     }
 
     private static void DeactivateMenu() {
-      ConnectedClients.MyPlayer.Avatar.GetComponent<FirstPersonController>().enabled = true;
+      ToggleControl(true);
       PauseMenu.SetActive(false);
       if (InventoryMenu.activeSelf) {
         InventoryMenuController.CloseMenu();
         InventoryMenu.SetActive(false);
       }
       PlayerHud.SetActive(true);
+    }
+
+    public static void ToggleControl(bool state) {
+      ConnectedCharacters.MyPlayer.Avatar.GetComponent<FirstPersonController>().enabled = state;
+      ConnectedCharacters.MyPlayer.Avatar.transform.Find("FirstPersonCharacter").GetComponent<PlayerCameraController>().enabled = state;
     }
   }
 }

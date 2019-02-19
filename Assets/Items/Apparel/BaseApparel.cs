@@ -1,5 +1,6 @@
 namespace Items.Apparel {
-  using Players;
+  using Characters;
+
   public class BaseApparel : BaseItem {
     private int armor;
 
@@ -12,13 +13,13 @@ namespace Items.Apparel {
       return armor;
     }
   
-    public override void Use(Player player) {
-      if (player.Apparel != GetId()) {
-        player.Apparel = GetId();
+    public override void Use(Character character) {
+      if (character.Apparel != GetId()) {
+        character.Apparel = GetId();
       } else {
-        player.Apparel = -1;
+        character.Apparel = -1;
       }
-      player.UpdateStats();
+      character.UpdateStats();
     }
   }
 }

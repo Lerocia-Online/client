@@ -3,7 +3,7 @@ namespace Menus.Controllers {
   using System.Linq;
   using UnityEngine;
   using UnityEngine.UI;
-  using Players;
+  using Characters;
   using Items;
   using Networking;
 
@@ -33,7 +33,7 @@ namespace Menus.Controllers {
 
     // Update is called once per frame
     void Update() {
-      if (Time.time - _lastScrollTime > ScrollDelay && ConnectedClients.MyPlayer.Inventory.Count > 0) {
+      if (Time.time - _lastScrollTime > ScrollDelay && ConnectedCharacters.MyPlayer.Inventory.Count > 0) {
         if (Input.GetAxis("Vertical") > 0) {
           MoveUp();
         } else if (Input.GetAxis("Vertical") < 0) {
@@ -55,17 +55,17 @@ namespace Menus.Controllers {
 
           GameObject playerPanel = transform.Find("Player Panel").gameObject;
           playerPanel.transform.Find("Health Bar").GetComponent<Slider>().value =
-            ConnectedClients.MyPlayer.CurrentHealth;
+            ConnectedCharacters.MyPlayer.CurrentHealth;
           playerPanel.transform.Find("Stamina Bar").GetComponent<Slider>().value =
-            ConnectedClients.MyPlayer.CurrentStamina;
+            ConnectedCharacters.MyPlayer.CurrentStamina;
           playerPanel.transform.Find("Gold").transform.Find("Value").GetComponent<Text>().text =
-            ConnectedClients.MyPlayer.Gold.ToString();
+            ConnectedCharacters.MyPlayer.Gold.ToString();
           playerPanel.transform.Find("Weight").transform.Find("Value").GetComponent<Text>().text =
-            ConnectedClients.MyPlayer.Weight.ToString();
+            ConnectedCharacters.MyPlayer.Weight.ToString();
           playerPanel.transform.Find("Armor").transform.Find("Value").GetComponent<Text>().text =
-            ConnectedClients.MyPlayer.Armor.ToString();
+            ConnectedCharacters.MyPlayer.Armor.ToString();
           playerPanel.transform.Find("Damage").transform.Find("Value").GetComponent<Text>().text =
-            ConnectedClients.MyPlayer.Damage.ToString();
+            ConnectedCharacters.MyPlayer.Damage.ToString();
         }
       }
     }
@@ -79,7 +79,7 @@ namespace Menus.Controllers {
 
       // Initialize categories for each item in inventory
       List<string> distinctCategories = new List<string>();
-      foreach (int itemId in ConnectedClients.MyPlayer.Inventory) {
+      foreach (int itemId in ConnectedCharacters.MyPlayer.Inventory) {
         distinctCategories.Add(ItemList.Items[itemId].GetCategory());
       }
 
@@ -105,7 +105,7 @@ namespace Menus.Controllers {
         nextPosition = Vector3.zero;
         _itemDictionary[category] = new List<GameObject>();
         Dictionary<int, int> uniqueItemDictionary = new Dictionary<int, int>();
-        foreach (int item_id in ConnectedClients.MyPlayer.Inventory) {
+        foreach (int item_id in ConnectedCharacters.MyPlayer.Inventory) {
           if (uniqueItemDictionary.ContainsKey(item_id)) {
             uniqueItemDictionary[item_id]++;
           } else {
@@ -126,7 +126,7 @@ namespace Menus.Controllers {
               itemText.GetComponent<Text>().text += " (" + itemId.Value + ")";
             }
 
-            if (ConnectedClients.MyPlayer.Weapon == itemId.Key || ConnectedClients.MyPlayer.Apparel == itemId.Key) {
+            if (ConnectedCharacters.MyPlayer.Weapon == itemId.Key || ConnectedCharacters.MyPlayer.Apparel == itemId.Key) {
               itemText.transform.Find("Equipped").gameObject.SetActive(true);
             } else {
               itemText.transform.Find("Equipped").gameObject.SetActive(false);
@@ -213,19 +213,19 @@ namespace Menus.Controllers {
 
     private void UseItem() {
       NetworkSend.Reliable("USE|" + GetCurrentSelectedItem().GetId());
-      GetCurrentSelectedItem().Use(ConnectedClients.MyPlayer);
+      GetCurrentSelectedItem().Use(ConnectedCharacters.MyPlayer);
       RefreshMenu();
     }
 
     private void DropItem() {
       GameObject item = new GameObject();
-      item.transform.position = ConnectedClients.MyPlayer.Avatar.transform.position;
-      item.transform.rotation = ConnectedClients.MyPlayer.Avatar.transform.rotation;
+      item.transform.position = ConnectedCharacters.MyPlayer.Avatar.transform.position;
+      item.transform.rotation = ConnectedCharacters.MyPlayer.Avatar.transform.rotation;
       item.transform.position += item.transform.TransformDirection(Vector3.forward) * 2;
       NetworkSend.Reliable("DROP|" + GetCurrentSelectedItem().GetId() + "|" + item.transform.position.x + "|" +
                           item.transform.position.y + "|" + item.transform.position.z);
       Destroy(item);
-      GetCurrentSelectedItem().Drop(ConnectedClients.MyPlayer);
+      GetCurrentSelectedItem().Drop(ConnectedCharacters.MyPlayer);
       RefreshMenu();
     }
 

@@ -1,4 +1,4 @@
-namespace Players {
+namespace Characters.Players {
   using System;
 
   [Serializable]

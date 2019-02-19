@@ -1,5 +1,6 @@
 namespace Items.Weapons {
-  using Players;
+  using Characters;
+
   public class BaseWeapon : BaseItem {
     private int damage;
 
@@ -12,17 +13,17 @@ namespace Items.Weapons {
       return damage;
     }
 
-    public void Equip(Player player) {
-      if (player.Weapon != GetId()) {
-        player.Weapon = GetId();
+    public void Equip(Character character) {
+      if (character.Weapon != GetId()) {
+        character.Weapon = GetId();
       } else {
-        player.Weapon = -1;
+        character.Weapon = -1;
       }
-      player.UpdateStats();
+      character.UpdateStats();
     }
 
-    public override void Use(Player player) {
-      Equip(player);
+    public override void Use(Character character) {
+      Equip(character);
     }
   }
 }

@@ -1,5 +1,6 @@
 namespace Items.Potions {
-  using Players;
+  using Characters;
+
   public class HealthPotion : BasePotion {
     private int health;
 
@@ -8,12 +9,12 @@ namespace Items.Potions {
       SetDescription("Heals by " + health + " points.");
     }
 
-    public override void Use(Player player) {
-      player.CurrentHealth += health;
-      if (player.CurrentHealth >= player.MaxHealth) {
-        player.CurrentHealth = player.MaxHealth;
+    public override void Use(Character character) {
+      character.CurrentHealth += health;
+      if (character.CurrentHealth >= character.MaxHealth) {
+        character.CurrentHealth = character.MaxHealth;
       }
-      player.Inventory.Remove(GetId());
+      character.Inventory.Remove(GetId());
     }
   }
 }

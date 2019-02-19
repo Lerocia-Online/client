@@ -1,10 +1,13 @@
-﻿namespace Menus.Controllers {
+﻿using Characters;
+
+namespace Menus.Controllers {
 	using System.Collections;
 	using UnityEngine;
 	using UnityEngine.UI;
 	using Networking;
 	using Networking.Constants;
-	using Players;
+	using Characters;
+	using Characters.Players;
 
 	public class LoginMenuController : MonoBehaviour {
 
@@ -45,7 +48,7 @@
 						_errorText.text = user.error;
 					} else {
 						_errorText.text = "Login successful";
-						ConnectedClients.MyUser = user;
+						ConnectedCharacters.MyUser = user;
 						NetworkSettings.InitializeNetworkTransport();
 					}
 				} else {

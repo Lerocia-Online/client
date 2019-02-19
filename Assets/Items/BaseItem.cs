@@ -1,6 +1,6 @@
 namespace Items {
   using System.Collections.Generic;
-  using Players;
+  using Characters;
 
   public abstract class BaseItem {
     private int id;
@@ -59,10 +59,10 @@ namespace Items {
       return stats;
     }
 
-    public abstract void Use(Player player);
+    public abstract void Use(Character character);
 
-    public void Drop(Player player) {
-      player.Inventory.Remove(id);
+    public void Drop(Character character) {
+      character.Inventory.Remove(id);
     }
   }
 }

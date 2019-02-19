@@ -1,11 +1,11 @@
-namespace Players {
+namespace Characters {
   using System.Collections.Generic;
   using UnityEngine;
   using Items;
   using Items.Weapons;
   using Items.Apparel;
 
-  public class Player {
+  public abstract class Character {
     // Identifiers
     public string Name;
     public GameObject Avatar;
@@ -29,8 +29,11 @@ namespace Players {
     public int CurrentStamina;
     public int Gold;
     public int Weight;
+    public int BaseArmor;
     public int Armor;
+    public int BaseDamage;
     public int Damage;
+    public bool IsDead;
 
     // Equipped armor & weapons
     public int Weapon;
@@ -38,7 +41,7 @@ namespace Players {
 
     public List<int> Inventory;
 
-    public Player(string name, GameObject avatar) {
+    public Character(string name, GameObject avatar, int maxHealth, int maxStamina, int baseDamage, int baseArmor) {
       Name = name;
       Avatar = avatar;
       IsLerpingPosition = false;
@@ -46,14 +49,17 @@ namespace Players {
       RealPosition = avatar.transform.position;
       RealRotation = avatar.transform.rotation;
       TimeBetweenMovementStart = Time.time;
-      MaxHealth = 100;
+      MaxHealth = maxHealth;
       CurrentHealth = MaxHealth;
-      MaxStamina = 100;
+      MaxStamina = maxStamina;
       CurrentStamina = MaxStamina;
-      Gold = 0;
       Weight = 0;
-      Armor = 0;
-      Damage = 0;
+      Gold = 0;
+      BaseDamage = baseDamage;
+      Damage = BaseDamage;
+      BaseArmor = baseArmor;
+      Armor = BaseArmor;
+      IsDead = false;
       Weapon = -1;
       Apparel = -1;
       Inventory = new List<int>();
@@ -64,34 +70,31 @@ namespace Players {
         BaseWeapon weapon = ItemList.Items[Weapon] as BaseWeapon;
         Damage = weapon.GetDamage();
       } else {
-        Damage = 0;
+        Damage = BaseDamage;
       }
 
       if (Apparel >= 0) {
         BaseApparel apparel = ItemList.Items[Apparel] as BaseApparel;
         Armor = apparel.GetArmor();
       } else {
-        Armor = 0;
+        Armor = BaseArmor;
       }
     }
     
     public void TakeDamage(int damage) {
-      damage = damage - Armor;
-      if (damage <= 0) {
-        damage = 0;
-      }
+      if (!IsDead) {
+        damage = damage - Armor;
+        if (damage <= 0) {
+          damage = 0;
+        }
 
-      CurrentHealth -= damage;
-      if (CurrentHealth <= 0) {
-        KillPlayer();
+        CurrentHealth -= damage;
+        if (CurrentHealth <= 0) {
+          Kill();
+        }
       }
     }
 
-    private void KillPlayer() {
-      // Reset players health
-      CurrentHealth = MaxHealth;
-      // Move them back to "spawn" point
-      Avatar.transform.position = new Vector3(0, 1, 0);
-    }
+    protected abstract void Kill();
   }
 }
