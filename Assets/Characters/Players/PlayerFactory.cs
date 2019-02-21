@@ -32,8 +32,9 @@
 			playerObject.GetComponent<PlayerReference>().ConnectionId = connectionId;
 			playerObject.AddComponent<CharacterAnimator>();
 			// Create new player
-			ConnectedCharacters.MyPlayer = new Player(playerName, playerObject, 100, 100, 5, 0);
+			ConnectedCharacters.MyPlayer = new Player(playerName, playerObject, "friendly", 100, 100, 5, 0);
 			// Add my player to players dictionary
+			ConnectedCharacters.Characters.Add(ConnectedCharacters.MyPlayer);
 			ConnectedCharacters.Players.Add(connectionId, ConnectedCharacters.MyPlayer);
 			//Disable login menu
 			CanvasSettings.LoginMenu.SetActive(false);
@@ -56,8 +57,9 @@
 			playerObject.GetComponent<PlayerReference>().ConnectionId = connectionId;
 			playerObject.AddComponent<CharacterAnimator>();
 			// Create new player
-			Player player = new Player(playerName, playerObject, 100, 100, 5, 0);
+			Player player = new Player(playerName, playerObject, "friendly", 100, 100, 5, 0);
 			// Add player to players dictionary
+			ConnectedCharacters.Characters.Add(player);
 			ConnectedCharacters.Players.Add(connectionId, player);
 			// Set player references
 			ConnectedCharacters.Players[connectionId].Avatar.GetComponent<CharacterLerpController>().Character = player;

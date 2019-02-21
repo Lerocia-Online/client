@@ -2,10 +2,10 @@ namespace Characters.NPCs {
   using System.Collections.Generic;
 
   public static class DialogueList {
-    public static readonly Dictionary<string, Dictionary<string, Dialogue>> Dialogues =
-      new Dictionary<string, Dictionary<string, Dialogue>> {
+    public static readonly Dictionary<int, Dictionary<string, Dialogue>> Dialogues =
+      new Dictionary<int, Dictionary<string, Dialogue>> {
         {
-          "Dead",
+          0,
           new Dictionary<string, Dialogue> {
             {
               "INTERACT",
@@ -16,7 +16,7 @@ namespace Characters.NPCs {
             }
           }
         }, {
-          "Harold",
+          1,
           new Dictionary<string, Dialogue> {
             {
               "INTERACT",
@@ -44,7 +44,7 @@ namespace Characters.NPCs {
             }
           }
         }, {
-          "Albert",
+          2,
           new Dictionary<string, Dialogue> {
             {
               "INTERACT",
@@ -65,7 +65,7 @@ namespace Characters.NPCs {
             }
           }
         }, {
-          "Clarence",
+          3,
           new Dictionary<string, Dialogue> {
             {
               "INTERACT",

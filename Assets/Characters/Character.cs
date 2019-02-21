@@ -9,6 +9,7 @@ namespace Characters {
     // Identifiers
     public string Name;
     public GameObject Avatar;
+    public string Type;
 
     // Movement interpolation
     public bool IsLerpingPosition;
@@ -41,9 +42,10 @@ namespace Characters {
 
     public List<int> Inventory;
 
-    public Character(string name, GameObject avatar, int maxHealth, int maxStamina, int baseDamage, int baseArmor) {
+    public Character(string name, GameObject avatar, string type, int maxHealth, int maxStamina, int baseDamage, int baseArmor) {
       Name = name;
       Avatar = avatar;
+      Type = type;
       IsLerpingPosition = false;
       IsLerpingRotation = false;
       RealPosition = avatar.transform.position;

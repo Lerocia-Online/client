@@ -3,8 +3,8 @@ namespace Characters.Players {
   using Menus;
 
   public class Player : Character {
-    public Player(string name, GameObject avatar, int maxHealth, int maxStamina, int baseDamage, int baseArmor) : base(
-      name, avatar, maxHealth, maxStamina, baseDamage, baseArmor) { }
+    public Player(string name, GameObject avatar, string type, int maxHealth, int maxStamina, int baseDamage, int baseArmor) : base(
+      name, avatar, type, maxHealth, maxStamina, baseDamage, baseArmor) { }
 
     protected override void Kill() {
       // Reset players health

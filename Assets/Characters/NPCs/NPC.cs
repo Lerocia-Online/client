@@ -7,8 +7,8 @@ namespace Characters.NPCs {
   public class NPC : Character {
     private Dictionary<string, Dialogue> _dialogues;
 
-    public NPC(string name, GameObject avatar, int maxHealth, int maxStamina, int baseDamage, int baseArmor,
-      Dictionary<string, Dialogue> dialogues) : base(name, avatar, maxHealth, maxStamina, baseDamage, baseArmor) {
+    public NPC(string name, GameObject avatar, string type, int maxHealth, int maxStamina, int baseDamage, int baseArmor,
+      Dictionary<string, Dialogue> dialogues) : base(name, avatar, type, maxHealth, maxStamina, baseDamage, baseArmor) {
       _dialogues = dialogues;
     }
 
@@ -27,7 +27,7 @@ namespace Characters.NPCs {
     protected override void Kill() {
       //TODO Handle NPC death
       IsDead = true;
-      _dialogues = DialogueList.Dialogues["Dead"];
+      _dialogues = DialogueList.Dialogues[0];
       NetworkSend.Reliable("NPCITEMS|" + Avatar.GetComponent<NPCReference>().NPCId);
     }
 

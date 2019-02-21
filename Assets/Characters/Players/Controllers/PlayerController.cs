@@ -39,12 +39,14 @@
           int connectionId = hit.transform.gameObject.GetComponent<PlayerReference>().ConnectionId;
           CanvasSettings.PlayerHudController.ActivateEnemyView(ConnectedCharacters.Players[connectionId]);
           NetworkSend.Reliable("HIT|" + connectionId + "|" + ConnectedCharacters.MyPlayer.Damage);
+          ConnectedCharacters.Players[connectionId].TakeDamage(ConnectedCharacters.MyPlayer.Damage);
         }
 
         if (hit.transform.CompareTag("NPC")) {
           int npcId = hit.transform.gameObject.GetComponent<NPCReference>().NPCId;
           CanvasSettings.PlayerHudController.ActivateEnemyView(ConnectedCharacters.NPCs[npcId]);
           NetworkSend.Reliable("HITNPC|" + npcId + "|" + ConnectedCharacters.MyPlayer.Damage);
+          ConnectedCharacters.NPCs[npcId].TakeDamage(ConnectedCharacters.MyPlayer.Damage);
         }
       }
     }

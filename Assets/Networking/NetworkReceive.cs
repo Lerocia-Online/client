@@ -200,11 +200,15 @@
         CanvasSettings.PlayerHudController.ActivateHealthView();
       }
 
-      ConnectedCharacters.Players[hitId].TakeDamage(damage);
+      if (connectionId != ConnectedCharacters.MyUser.connection_id) {
+        ConnectedCharacters.Players[hitId].TakeDamage(damage);
+      }
     }
 
     private void OnHitNPC(int connectionId, int hitId, int damage) {
-      ConnectedCharacters.NPCs[hitId].TakeDamage(damage);
+      if (connectionId != ConnectedCharacters.MyUser.connection_id) {
+        ConnectedCharacters.NPCs[hitId].TakeDamage(damage);
+      }
     }
 
     private void OnUse(int connectionId, int itemId) {
