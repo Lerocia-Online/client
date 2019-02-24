@@ -1,6 +1,6 @@
-# Multiplayer Project
+# Lerocia Online
 
-Multiplayer Project is an online multiplayer game built using the Unity3D engine. Players all connect to one world that they can explore together, collect items and weapons, and battle each other!
+Lerocia Online is an online multiplayer game built using the Unity3D engine. Players all connect to one world that they can explore together, collect items and weapons, and battle each other!
 
 ## Getting Started - User
 
@@ -13,7 +13,7 @@ macOS 10.11+
 
 ### Downloading and Running
 
-Visit [http://www.lerocia.com/](http://www.lerocia.com/) for the client zip downloads.
+Visit [https://www.lerocia.com/](https://www.lerocia.com/) for the client zip downloads.
 Once the download has finished, unzip the file and run `ClientBuild` to launch the game.
 
 ## Getting Started - Developer
@@ -25,15 +25,19 @@ These instructions will get you a copy of the project up and running on your loc
 First you'll need to clone the repository. Navigate to the directory you want to keep the project in and run the following command to clone with HTTPS.
 
 ```
-git clone https://github.com/JeffreyThor/Multiplayer-Project.git
+git clone https://github.com/Lerocia-Online/client.git
 ```
 
-Now there's one file you'll need to create in the `Assets/Scripts` directory of the repository you just cloned and call it `NetworkSettings.cs`. Now this file won't be tracked by git assuming you've named it properly so you don't need to worry about that, but here are the contents you should copy and paste into that file.
+Now there's one file you'll need to create in the `Assets/Networking/Constants` directory of the repository you just cloned and call it `NetworkConstants.cs`. Now this file won't be tracked by git assuming you've named it properly so you don't need to worry about that, but here are the contents you should copy and paste into that file.
 
 ```
-public static class NetworkSettings {  
-  public const string ADDRESS = "127.0.0.1";  
-  public const int PORT = 7777;  
+namespace Networking.Constants {
+  public static class NetworkConstants {
+    public const string Address = "127.0.0.1";
+    public const int Port = 7777;
+    public const string Api = "https://www.lerocia.com/api/";
+    public const int MaxConnection = 100;
+  }
 }
 ```
 
