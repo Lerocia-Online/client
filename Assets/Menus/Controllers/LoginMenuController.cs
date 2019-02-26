@@ -1,13 +1,11 @@
-﻿using Characters;
-
-namespace Menus.Controllers {
+﻿namespace Menus.Controllers {
 	using System.Collections;
 	using UnityEngine;
 	using UnityEngine.UI;
 	using Networking;
 	using Networking.Constants;
-	using Characters;
-	using Characters.Players;
+	using Lerocia.Characters;
+	using Lerocia.Characters.Players;
 
 	public class LoginMenuController : MonoBehaviour {
 

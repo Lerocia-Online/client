@@ -4,10 +4,10 @@
   using System.Reflection;
   using UnityEngine;
   using UnityEngine.UI;
-  using Characters;
-  using Characters.Players;
+  using Lerocia.Characters;
+  using Lerocia.Characters.Players;
   using Characters.NPCs;
-  using Items;
+  using Lerocia.Items;
 
   public class PlayerHUDController : MonoBehaviour {
     [SerializeField] private GameObject _itemStatPrefab;

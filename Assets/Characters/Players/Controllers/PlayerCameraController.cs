@@ -4,6 +4,8 @@ namespace Characters.Players.Controllers {
   using Menus;
   using Networking;
   using NPCs;
+  using Lerocia.Characters;
+  using Lerocia.Items;
 
   public class PlayerCameraController : MonoBehaviour {
     private RaycastHit _hit;

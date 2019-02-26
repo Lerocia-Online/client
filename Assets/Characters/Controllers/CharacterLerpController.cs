@@ -1,5 +1,6 @@
 ﻿namespace Characters.Controllers {
   using UnityEngine;
+  using Lerocia.Characters;
 
   public class CharacterLerpController : MonoBehaviour {
     public Character Character;

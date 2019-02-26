@@ -4,6 +4,7 @@
   using Networking;
   using Animation;
   using NPCs;
+  using Lerocia.Characters;
 
   public class PlayerController : MonoBehaviour {
     private CharacterAnimator _characterAnimator;

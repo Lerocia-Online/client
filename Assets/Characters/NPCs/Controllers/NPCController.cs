@@ -2,6 +2,7 @@ namespace Characters.NPCs.Controllers {
   using System.Collections.Generic;
   using UnityEngine;
   using UnityEngine.AI;
+  using Lerocia.Characters;
 
   public class NPCController : MonoBehaviour {
     private float _lookRadius = 10f;

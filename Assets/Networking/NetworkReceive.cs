@@ -2,11 +2,12 @@
   using System.Text;
   using UnityEngine;
   using UnityEngine.Networking;
-  using Characters;
+  using Lerocia.Characters;
   using Characters.Players;
   using Characters.NPCs;
   using Characters.Animation;
   using Items;
+  using Lerocia.Items;
   using Menus;
 
   public class NetworkReceive : MonoBehaviour {
@@ -103,8 +104,7 @@
       // Create all the other players
       for (int i = 2; i < data.Length - 1; i++) {
         string[] d = data[i].Split('%');
-        //TODO Store and retrieve position to set
-        _playerFactory.Spawn(d[0], int.Parse(d[1]), 0, 0, 0);
+        _playerFactory.Spawn(d[0], int.Parse(d[1]), float.Parse(d[2]), float.Parse(d[3]), float.Parse(d[4]), float.Parse(d[5]), float.Parse(d[6]), float.Parse(d[7]), d[8], int.Parse(d[9]), int.Parse(d[10]), int.Parse(d[11]), int.Parse(d[12]), int.Parse(d[13]), int.Parse(d[14]), int.Parse(d[15]));
       }
     }
 
@@ -123,8 +123,7 @@
     }
 
     private void OnConnect(string[] data) {
-      //TODO Store and retrieve position to set
-      _playerFactory.Spawn(data[1], int.Parse(data[2]), 0, 0, 0);
+      _playerFactory.Spawn(data[1], int.Parse(data[2]), float.Parse(data[3]), float.Parse(data[4]), float.Parse(data[5]), float.Parse(data[6]), float.Parse(data[7]), float.Parse(data[8]), data[9], int.Parse(data[10]), int.Parse(data[11]), int.Parse(data[12]), int.Parse(data[13]), int.Parse(data[14]), int.Parse(data[15]), int.Parse(data[16]));
     }
 
     private void OnDisconnect(int connectionId) {

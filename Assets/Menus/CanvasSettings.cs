@@ -1,7 +1,7 @@
 ﻿namespace Menus {
   using UnityEngine;
   using UnityStandardAssets.Characters.FirstPerson;
-  using Characters;
+  using Lerocia.Characters;
   using Characters.Players.Controllers;
   using Controllers;
 

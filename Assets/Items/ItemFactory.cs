@@ -1,5 +1,6 @@
 namespace Items {
   using UnityEngine;
+  using Lerocia.Items;
 
   public class ItemFactory : MonoBehaviour {
     public GameObject ItemPrefab;

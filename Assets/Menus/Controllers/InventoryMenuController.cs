@@ -3,7 +3,8 @@ namespace Menus.Controllers {
   using System.Linq;
   using UnityEngine;
   using UnityEngine.UI;
-  using Characters;
+  using Lerocia.Characters;
+  using Lerocia.Items;
   using Items;
   using Networking;
 
@@ -54,8 +55,12 @@ namespace Menus.Controllers {
           }
 
           GameObject playerPanel = transform.Find("Player Panel").gameObject;
+          playerPanel.transform.Find("Health Bar").GetComponent<Slider>().maxValue =
+            ConnectedCharacters.MyPlayer.MaxHealth;
           playerPanel.transform.Find("Health Bar").GetComponent<Slider>().value =
             ConnectedCharacters.MyPlayer.CurrentHealth;
+          playerPanel.transform.Find("Stamina Bar").GetComponent<Slider>().maxValue =
+            ConnectedCharacters.MyPlayer.MaxStamina;
           playerPanel.transform.Find("Stamina Bar").GetComponent<Slider>().value =
             ConnectedCharacters.MyPlayer.CurrentStamina;
           playerPanel.transform.Find("Gold").transform.Find("Value").GetComponent<Text>().text =

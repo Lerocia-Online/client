@@ -4,6 +4,8 @@ namespace Characters.NPCs {
   using Animation;
   using Characters.Controllers;
   using Controllers;
+  using Lerocia.Characters;
+  using Lerocia.Characters.NPCs;
 
   public class NPCFactory : MonoBehaviour {
     public GameObject NPCPrefab;
@@ -38,7 +40,7 @@ namespace Characters.NPCs {
       npcObject.AddComponent<NPCReference>();
       npcObject.GetComponent<NPCReference>().NPCId = npcId;
       npcObject.AddComponent<CharacterAnimator>();
-      NPC npc = new NPC(npcName, npcObject, type, 100, 100, 5, 0, DialogueList.Dialogues[dialogueId]);
+      ClientNPC npc = new ClientNPC(npcName, npcObject, type, 100, 100, 100, 100, 0, 5, 0, -1, -1, dialogueId);
       ConnectedCharacters.Characters.Add(npc);
       ConnectedCharacters.NPCs.Add(npcId, npc);
       ConnectedCharacters.NPCs[npcId].Avatar.GetComponent<CharacterLerpController>().Character = npc;
