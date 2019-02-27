@@ -5,7 +5,7 @@ namespace Characters.NPCs {
   using Characters.Controllers;
   using Controllers;
   using Lerocia.Characters;
-  using Lerocia.Characters.NPCs;
+  using UnityEngine.AI;
 
   public class NPCFactory : MonoBehaviour {
     public GameObject NPCPrefab;
@@ -23,7 +23,7 @@ namespace Characters.NPCs {
       string type, int dialogueId) {
       GameObject npcObject = Instantiate(NPCPrefab);
       npcObject.name = npcName;
-      npcObject.transform.position = new Vector3(px, py, pz);
+      npcObject.GetComponent<NavMeshAgent>().Warp(new Vector3(px, py, pz));
       npcObject.transform.rotation = Quaternion.Euler(new Vector3(rx, ry, rz));
       npcObject.AddComponent<NPCController>();
       if (type == "friendly") {

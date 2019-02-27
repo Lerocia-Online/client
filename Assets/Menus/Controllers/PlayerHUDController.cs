@@ -36,13 +36,13 @@
     private Text _captionText;
     private Character _enemyCharacter;
     private float _enemyViewUpdateTime;
-    private const float EnemyViewTimer = 30.0f;
+    private const float EnemyViewTimer = 10.0f;
     private float _healthViewUpdateTime;
-    private const float HealthViewTimer = 30.0f;
+    private const float HealthViewTimer = 10.0f;
     private float _staminaViewUpdateTime;
-    private const float StaminaViewTimer = 30.0f;
+    private const float StaminaViewTimer = 10.0f;
     private float _captionViewUpdateTime;
-    private const float CaptionViewTimer = 10.0f;
+    private const float CaptionViewTimer = 5.0f;
     public Player Player;
 
     // Use this for initialization
