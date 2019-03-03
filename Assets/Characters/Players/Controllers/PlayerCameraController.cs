@@ -33,13 +33,13 @@ namespace Characters.Players.Controllers {
         }
 
         if (_hit.transform.CompareTag("NPC")) {
-          if (_hit.transform.gameObject.GetComponent<NPCReference>().NPCId != _lastNPCHit) {
-            _lastNPCHit = _hit.transform.gameObject.GetComponent<NPCReference>().NPCId;
+          if (_hit.transform.gameObject.GetComponent<CharacterReference>().CharacterId != _lastNPCHit) {
+            _lastNPCHit = _hit.transform.gameObject.GetComponent<CharacterReference>().CharacterId;
             CanvasSettings.PlayerHudController.ActivateInteractableView();
             if (!ConnectedCharacters.NPCs[_lastNPCHit].IsDead) {
-              CanvasSettings.PlayerHudController.SetNPCView(ConnectedCharacters.NPCs[_lastNPCHit].Name);
+              CanvasSettings.PlayerHudController.SetNPCView(ConnectedCharacters.NPCs[_lastNPCHit].CharacterName);
             } else {
-              CanvasSettings.PlayerHudController.SetLootView(ConnectedCharacters.NPCs[_lastNPCHit].Name);
+              CanvasSettings.PlayerHudController.SetLootView(ConnectedCharacters.NPCs[_lastNPCHit].CharacterName);
             }
           }
 

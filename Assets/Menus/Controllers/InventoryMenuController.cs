@@ -131,7 +131,7 @@ namespace Menus.Controllers {
               itemText.GetComponent<Text>().text += " (" + itemId.Value + ")";
             }
 
-            if (ConnectedCharacters.MyPlayer.Weapon == itemId.Key || ConnectedCharacters.MyPlayer.Apparel == itemId.Key) {
+            if (ConnectedCharacters.MyPlayer.WeaponId == itemId.Key || ConnectedCharacters.MyPlayer.ApparelId == itemId.Key) {
               itemText.transform.Find("Equipped").gameObject.SetActive(true);
             } else {
               itemText.transform.Find("Equipped").gameObject.SetActive(false);

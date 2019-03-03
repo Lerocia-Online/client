@@ -40,17 +40,19 @@
 			yield return w;
 
 			if (string.IsNullOrEmpty(w.error)) {
-				User user = JsonUtility.FromJson<User>(w.text);
-				if (user.success) {
-					if (user.error != "") {
-						_errorText.text = user.error;
+				DatabasePlayer databasePlayer = JsonUtility.FromJson<DatabasePlayer>(w.text);
+				Debug.Log(w.text);
+				if (databasePlayer.success) {
+					if (databasePlayer.error != "") {
+						_errorText.text = databasePlayer.error;
 					} else {
 						_errorText.text = "Login successful";
-						ConnectedCharacters.MyUser = user;
+						Debug.Log(databasePlayer.character_name);
+						ConnectedCharacters.MyDatabasePlayer = databasePlayer;
 						NetworkSettings.InitializeNetworkTransport();
 					}
 				} else {
-					_errorText.text = user.error;
+					_errorText.text = databasePlayer.error;
 					NetworkSettings.IsLoggingIn = false;
 				}
 			} else {

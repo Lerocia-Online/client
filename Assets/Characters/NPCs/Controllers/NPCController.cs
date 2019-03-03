@@ -18,8 +18,8 @@ namespace Characters.NPCs.Controllers {
       if (TargetTypes != null) {
         float closestDistance = float.MaxValue;
         bool foundTarget = false;
-        foreach (Character character in ConnectedCharacters.Characters) {
-          if (TargetTypes.Contains(character.Type)) {
+        foreach (Character character in ConnectedCharacters.Characters.Values) {
+          if (TargetTypes.Contains(character.CharacterPersonality)) {
             float distance = Vector3.Distance(character.Avatar.transform.position, transform.position);
 
             if (distance < _lookRadius && distance < closestDistance) {

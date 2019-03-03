@@ -4,10 +4,39 @@ namespace Characters.Players {
   using Menus;
 
   public class ClientPlayer : Player {
-    public ClientPlayer(string name, GameObject avatar, string type, int maxHealth, int currentHealth, int maxStamina,
-      int currentStamina, int gold, int baseDamage, int baseArmor, int weapon, int apparel) : base(
-      name, avatar, type, maxHealth, currentHealth, maxStamina, currentStamina, gold, baseDamage, baseArmor, weapon,
-      apparel) { }
+    public ClientPlayer(
+      int characterId, 
+      string characterName, 
+      string characterPersonality,
+      GameObject avatar, 
+      int maxHealth, 
+      int currentHealth, 
+      int maxStamina,
+      int currentStamina,
+      int gold, 
+      int baseWeight,
+      int baseDamage, 
+      int baseArmor, 
+      int weaponId, 
+      int apparelId,
+      int dialogueId
+    ) : base(
+      characterId, 
+      characterName, 
+      characterPersonality,
+      avatar, 
+      maxHealth, 
+      currentHealth, 
+      maxStamina, 
+      currentStamina, 
+      gold, 
+      baseWeight,
+      baseDamage, 
+      baseArmor, 
+      weaponId,
+      apparelId,
+      dialogueId
+    ) { }
 
     protected override void Kill() {
       //TODO Handle ClientPlayer death

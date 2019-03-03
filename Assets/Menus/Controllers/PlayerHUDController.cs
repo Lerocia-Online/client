@@ -127,7 +127,7 @@
 
     public void Interact(string text) {
       string[] options = ConnectedCharacters
-        .NPCs[_currentInteractingCharacter.Avatar.GetComponent<NPCReference>().NPCId]
+        .NPCs[_currentInteractingCharacter.Avatar.GetComponent<CharacterReference>().CharacterId]
         .Interact(text);
       if (options != null) {
         if (options.Length > 1) {
@@ -188,7 +188,7 @@
     public void UpdateEnemyView(Character character) {
       _enemyViewUpdateTime = Time.time;
       _enemyCharacter = character;
-      _enemyName.text = character.Name;
+      _enemyName.text = character.CharacterName;
     }
 
     public void ActivateHealthView() {
@@ -224,7 +224,7 @@
       _isDialogueView = true;
       CanvasSettings.ToggleControl(false);
       _currentInteractingCharacter = character;
-      _helpText.text = character.Name;
+      _helpText.text = character.CharacterName;
       _name.text = "";
       _lastScrollTime = Time.time;
       _currentDialogueIndex = 0;

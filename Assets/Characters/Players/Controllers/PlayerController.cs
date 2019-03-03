@@ -37,14 +37,14 @@
       RaycastHit hit;
       if (Physics.Raycast(gameObject.transform.position, transform.forward, out hit, Range)) {
         if (hit.transform.CompareTag("Player")) {
-          int connectionId = hit.transform.gameObject.GetComponent<PlayerReference>().ConnectionId;
-          CanvasSettings.PlayerHudController.ActivateEnemyView(ConnectedCharacters.Players[connectionId]);
-          NetworkSend.Reliable("HIT|" + connectionId + "|" + ConnectedCharacters.MyPlayer.Damage);
-          ConnectedCharacters.Players[connectionId].TakeDamage(ConnectedCharacters.MyPlayer.Damage);
+          int characterId = hit.transform.gameObject.GetComponent<CharacterReference>().CharacterId;
+          CanvasSettings.PlayerHudController.ActivateEnemyView(ConnectedCharacters.Players[characterId]);
+          NetworkSend.Reliable("HIT|" + characterId + "|" + ConnectedCharacters.MyPlayer.Damage);
+          ConnectedCharacters.Players[characterId].TakeDamage(ConnectedCharacters.MyPlayer.Damage);
         }
 
         if (hit.transform.CompareTag("NPC")) {
-          int npcId = hit.transform.gameObject.GetComponent<NPCReference>().NPCId;
+          int npcId = hit.transform.gameObject.GetComponent<CharacterReference>().CharacterId;
           CanvasSettings.PlayerHudController.ActivateEnemyView(ConnectedCharacters.NPCs[npcId]);
           NetworkSend.Reliable("HITNPC|" + npcId + "|" + ConnectedCharacters.MyPlayer.Damage);
           ConnectedCharacters.NPCs[npcId].TakeDamage(ConnectedCharacters.MyPlayer.Damage);
