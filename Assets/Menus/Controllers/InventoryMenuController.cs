@@ -24,6 +24,8 @@ namespace Menus.Controllers {
     private int _currentCategoryIndex;
     private List<int> _currentItemIndexes;
     private bool _isItemView;
+    private Character _currentCharacter;
+    private string _currentInteraction;
 
     // Use this for initialization
     void Start() {
@@ -34,7 +36,7 @@ namespace Menus.Controllers {
 
     // Update is called once per frame
     void Update() {
-      if (Time.time - _lastScrollTime > ScrollDelay && ConnectedCharacters.MyPlayer.Inventory.Count > 0) {
+      if (Time.time - _lastScrollTime > ScrollDelay && _currentCharacter.Inventory.Count > 0) {
         if (Input.GetAxis("Vertical") > 0) {
           MoveUp();
         } else if (Input.GetAxis("Vertical") < 0) {
@@ -48,10 +50,16 @@ namespace Menus.Controllers {
         }
 
         if (_isItemView) {
-          if (Input.GetKeyDown(KeyCode.E)) {
-            UseItem();
-          } else if (Input.GetKeyDown(KeyCode.R)) {
-            DropItem();
+          if (_currentInteraction == "INVENTORY") {
+            if (Input.GetKeyDown(KeyCode.E)) {
+              UseItem();
+            } else if (Input.GetKeyDown(KeyCode.R)) {
+              DropItem();
+            }
+          } else if (_currentInteraction == "MERCHANT") {
+            if (Input.GetKeyDown(KeyCode.E)) {
+              BuyItem();
+            }
           }
 
           GameObject playerPanel = transform.Find("Player Panel").gameObject;
@@ -75,7 +83,11 @@ namespace Menus.Controllers {
       }
     }
 
-    public void OpenMenu() {
+    public void OpenMenu(Character character, string interaction) {
+      // Set current character
+      _currentCharacter = character;
+      _currentInteraction = interaction;
+
       // Initialize dictionary of all items with key->value being category->items
       _itemDictionary = new Dictionary<GameObject, List<GameObject>>();
 
@@ -84,7 +96,7 @@ namespace Menus.Controllers {
 
       // Initialize categories for each item in inventory
       List<string> distinctCategories = new List<string>();
-      foreach (int itemId in ConnectedCharacters.MyPlayer.Inventory) {
+      foreach (int itemId in _currentCharacter.Inventory) {
         distinctCategories.Add(ItemList.Items[itemId].GetCategory());
       }
 
@@ -110,7 +122,7 @@ namespace Menus.Controllers {
         nextPosition = Vector3.zero;
         _itemDictionary[category] = new List<GameObject>();
         Dictionary<int, int> uniqueItemDictionary = new Dictionary<int, int>();
-        foreach (int item_id in ConnectedCharacters.MyPlayer.Inventory) {
+        foreach (int item_id in _currentCharacter.Inventory) {
           if (uniqueItemDictionary.ContainsKey(item_id)) {
             uniqueItemDictionary[item_id]++;
           } else {
@@ -131,11 +143,13 @@ namespace Menus.Controllers {
               itemText.GetComponent<Text>().text += " (" + itemId.Value + ")";
             }
 
-            if (ConnectedCharacters.MyPlayer.WeaponId == itemId.Key || ConnectedCharacters.MyPlayer.ApparelId == itemId.Key) {
+            if (ConnectedCharacters.MyPlayer.WeaponId == itemId.Key ||
+                ConnectedCharacters.MyPlayer.ApparelId == itemId.Key) {
               itemText.transform.Find("Equipped").gameObject.SetActive(true);
             } else {
               itemText.transform.Find("Equipped").gameObject.SetActive(false);
             }
+
             _itemDictionary[category].Add(itemText);
           }
         }
@@ -171,7 +185,8 @@ namespace Menus.Controllers {
     private void MoveDown() {
       if (!_isItemView && _currentCategoryIndex < _itemDictionary.Count - 1) {
         MoveVertical(1);
-      } else if (_isItemView && _currentItemIndexes[_currentCategoryIndex] < _itemDictionary[_currentCategory].Count - 1) {
+      } else if (_isItemView &&
+                 _currentItemIndexes[_currentCategoryIndex] < _itemDictionary[_currentCategory].Count - 1) {
         MoveVertical(1);
       }
     }
@@ -228,10 +243,19 @@ namespace Menus.Controllers {
       item.transform.rotation = ConnectedCharacters.MyPlayer.Avatar.transform.rotation;
       item.transform.position += item.transform.TransformDirection(Vector3.forward) * 2;
       NetworkSend.Reliable("DROP|" + GetCurrentSelectedItem().GetId() + "|" + item.transform.position.x + "|" +
-                          item.transform.position.y + "|" + item.transform.position.z);
+                           item.transform.position.y + "|" + item.transform.position.z);
       Destroy(item);
       GetCurrentSelectedItem().Drop(ConnectedCharacters.MyPlayer);
       RefreshMenu();
+    }
+
+    private void BuyItem() {
+      if (ConnectedCharacters.MyPlayer.BuyItem(_currentCharacter, GetCurrentSelectedItem().GetId())) {
+        NetworkSend.Reliable("BUY|" + _currentCharacter.CharacterId + "|" + GetCurrentSelectedItem().GetId());
+        RefreshMenu();
+      } else {
+        Debug.Log("Item purchase failed");
+      }
     }
 
     private void ToggleItemView(bool visible) {
@@ -343,7 +367,7 @@ namespace Menus.Controllers {
       int categoryIndex = _currentCategoryIndex;
       List<int> itemIndexes = new List<int>(_currentItemIndexes);
       CloseMenu();
-      OpenMenu();
+      OpenMenu(_currentCharacter, _currentInteraction);
       if (_itemDictionary.Count > 0) {
         for (int i = 0; i < categoryIndex; i++) {
           MoveDown();

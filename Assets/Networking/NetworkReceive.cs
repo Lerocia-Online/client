@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Networking {
+﻿namespace Networking {
   using System.Text;
   using UnityEngine;
   using UnityEngine.Networking;

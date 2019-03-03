@@ -44,6 +44,7 @@ namespace Characters.Players.Controllers {
           }
 
           if (Input.GetKeyDown(KeyCode.E)) {
+            NetworkSend.Reliable("NPCITEMS|" + _lastNPCHit);
             CanvasSettings.PlayerHudController.SetCurrentInteractingCharacter(ConnectedCharacters.NPCs[_lastNPCHit]);
             CanvasSettings.PlayerHudController.Interact("INTERACT");
           }

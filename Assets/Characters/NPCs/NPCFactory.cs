@@ -65,7 +65,7 @@ namespace Characters.NPCs {
       } else if (characterPersonality == "passive") {
         // Do nothing, passive does not target
       } else {
-        Debug.Log("Invalid Type");
+        Debug.Log("Invalid personality");
       }
 
       npcObject.AddComponent<CharacterLerpController>();

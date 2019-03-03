@@ -61,6 +61,7 @@ namespace Characters.NPCs {
 
     public override void StartMerchant() {
       //TODO Handle ClientNPC Start Merchant
+      CanvasSettings.ToggleInventoryMenu(this, "MERCHANT");
     }
 
     public override void LootBody() {

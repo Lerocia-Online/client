@@ -26,7 +26,7 @@
       InventoryMenu.SetActive(false);
     }
 
-    public static void ToggleInventoryMenu() {
+    public static void ToggleInventoryMenu(Character character, string interaction) {
       if (!PauseMenu.activeSelf) {
         if (InventoryMenu.activeSelf) {
           DeactivateMenu();
@@ -35,7 +35,7 @@
           PlayerHud.SetActive(false);
           PauseMenu.SetActive(false);
           InventoryMenu.SetActive(true);
-          InventoryMenuController.OpenMenu();
+          InventoryMenuController.OpenMenu(character, interaction);
         }
       }
     }

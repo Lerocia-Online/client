@@ -16,7 +16,7 @@
 
     private void Update() {
       if (Input.GetKeyDown(KeyCode.F)) {
-        CanvasSettings.ToggleInventoryMenu();
+        CanvasSettings.ToggleInventoryMenu(ConnectedCharacters.MyPlayer, "INVENTORY");
       }
 
       if (Input.GetKeyDown(KeyCode.Escape)) {
