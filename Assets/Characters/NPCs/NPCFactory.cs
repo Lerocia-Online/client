@@ -1,11 +1,8 @@
 namespace Characters.NPCs {
-  using System.Collections.Generic;
   using UnityEngine;
   using Animation;
-  using Characters.Controllers;
   using Controllers;
   using Lerocia.Characters;
-  using UnityEngine.AI;
 
   public class NPCFactory : MonoBehaviour {
     public GameObject NPCPrefab;
@@ -55,19 +52,8 @@ namespace Characters.NPCs {
     ) {
       GameObject npcObject = Instantiate(NPCPrefab);
       npcObject.name = characterName;
-      npcObject.GetComponent<NavMeshAgent>().Warp(new Vector3(px, py, pz));
+      npcObject.transform.position = new Vector3(px, py, pz);
       npcObject.transform.rotation = Quaternion.Euler(new Vector3(rx, ry, rz));
-      npcObject.AddComponent<NPCController>();
-      if (characterPersonality == "friendly") {
-        npcObject.GetComponent<NPCController>().TargetTypes = new List<string> {"enemy"};
-      } else if (characterPersonality == "enemy") {
-        npcObject.GetComponent<NPCController>().TargetTypes = new List<string> {"friendly", "passive"};
-      } else if (characterPersonality == "passive") {
-        // Do nothing, passive does not target
-      } else {
-        Debug.Log("Invalid personality");
-      }
-
       npcObject.AddComponent<CharacterLerpController>();
       npcObject.AddComponent<CharacterReference>();
       npcObject.GetComponent<CharacterReference>().CharacterId = characterId;

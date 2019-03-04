@@ -41,13 +41,11 @@
 
 			if (string.IsNullOrEmpty(w.error)) {
 				DatabasePlayer databasePlayer = JsonUtility.FromJson<DatabasePlayer>(w.text);
-				Debug.Log(w.text);
 				if (databasePlayer.success) {
 					if (databasePlayer.error != "") {
 						_errorText.text = databasePlayer.error;
 					} else {
 						_errorText.text = "Login successful";
-						Debug.Log(databasePlayer.character_name);
 						ConnectedCharacters.MyDatabasePlayer = databasePlayer;
 						NetworkSettings.InitializeNetworkTransport();
 					}

@@ -15,7 +15,7 @@ namespace Networking {
 
     private static void Send(string message, int channelId) {
       byte[] msg = Encoding.Unicode.GetBytes(message);
-      Debug.Log("Sending: " + message);
+//      Debug.Log("Sending: " + message);
       NetworkTransport.Send(NetworkSettings.HostId, NetworkSettings.ConnectionId, channelId, msg, message.Length * sizeof(char), out NetworkSettings.Error);
     }
   }

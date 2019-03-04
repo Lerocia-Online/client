@@ -40,7 +40,7 @@
       switch (recData) {
         case NetworkEventType.DataEvent:
           string message = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
-          Debug.Log("Receiving: " + message);
+//          Debug.Log("Receiving: " + message);
           string[] splitData = message.Split('|');
           switch (splitData[0]) {
             case "ASKNAME":
@@ -187,26 +187,26 @@
           rotation.y = float.Parse(d[6]);
           rotation.z = float.Parse(d[7]);
 
-          ConnectedCharacters.Players[int.Parse(d[0])].LastRealPosition =
-            ConnectedCharacters.Players[int.Parse(d[0])].RealPosition;
-          ConnectedCharacters.Players[int.Parse(d[0])].LastRealRotation =
-            ConnectedCharacters.Players[int.Parse(d[0])].RealRotation;
+          ConnectedCharacters.Characters[int.Parse(d[0])].LastRealPosition =
+            ConnectedCharacters.Characters[int.Parse(d[0])].RealPosition;
+          ConnectedCharacters.Characters[int.Parse(d[0])].LastRealRotation =
+            ConnectedCharacters.Characters[int.Parse(d[0])].RealRotation;
 
-          ConnectedCharacters.Players[int.Parse(d[0])].RealPosition = position;
-          ConnectedCharacters.Players[int.Parse(d[0])].RealRotation = rotation;
+          ConnectedCharacters.Characters[int.Parse(d[0])].RealPosition = position;
+          ConnectedCharacters.Characters[int.Parse(d[0])].RealRotation = rotation;
 
-          ConnectedCharacters.Players[int.Parse(d[0])].TimeToLerp = float.Parse(d[8]);
-          if (ConnectedCharacters.Players[int.Parse(d[0])].RealPosition !=
-              ConnectedCharacters.Players[int.Parse(d[0])].Avatar.transform.position) {
-            ConnectedCharacters.Players[int.Parse(d[0])].IsLerpingPosition = true;
+          ConnectedCharacters.Characters[int.Parse(d[0])].TimeToLerp = float.Parse(d[8]);
+          if (ConnectedCharacters.Characters[int.Parse(d[0])].RealPosition !=
+              ConnectedCharacters.Characters[int.Parse(d[0])].Avatar.transform.position) {
+            ConnectedCharacters.Characters[int.Parse(d[0])].IsLerpingPosition = true;
           }
 
-          if (ConnectedCharacters.Players[int.Parse(d[0])].RealRotation !=
-              ConnectedCharacters.Players[int.Parse(d[0])].Avatar.transform.rotation) {
-            ConnectedCharacters.Players[int.Parse(d[0])].IsLerpingRotation = true;
+          if (ConnectedCharacters.Characters[int.Parse(d[0])].RealRotation !=
+              ConnectedCharacters.Characters[int.Parse(d[0])].Avatar.transform.rotation) {
+            ConnectedCharacters.Characters[int.Parse(d[0])].IsLerpingRotation = true;
           }
 
-          ConnectedCharacters.Players[int.Parse(d[0])].TimeStartedLerping = Time.time;
+          ConnectedCharacters.Characters[int.Parse(d[0])].TimeStartedLerping = Time.time;
         }
       }
 
