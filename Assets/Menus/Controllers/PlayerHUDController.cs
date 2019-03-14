@@ -91,7 +91,7 @@
       }
 
       if (Time.time - _staminaViewUpdateTime > StaminaViewTimer) {
-        DeactivateHealthView();
+        DeactivateStaminaView();
       }
 
       if (Time.time - _captionViewUpdateTime > CaptionViewTimer) {
