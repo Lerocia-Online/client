@@ -12,6 +12,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Server.unity
     guid: 7f4cd1d1f1274410da846f98972db93a
   - enabled: 1
-    path: Assets/Scenes/Client.unity
+    path: Assets/Scenes/Lerocia.unity
     guid: 223f9a59fe020477a8d131d637d14735
   m_configObjects: {}

@@ -1,15 +1,13 @@
 ﻿namespace Characters.Players {
 	using UnityEngine;
 	using Menus;
-	using Controllers;
 	using Menus.Controllers;
 	using Networking;
-	using Animation;
 	using Characters.Controllers;
 	using Lerocia.Characters;
 
 	public class PlayerFactory : MonoBehaviour {
-		public GameObject MyPlayerPrefab;
+		public GameObject MyPlayerObject;
 		public GameObject PlayerPrefab;
 
 		public void Spawn(
@@ -90,17 +88,11 @@
 			int dialogueId
 		) {
 			// Create my player object
-			GameObject playerObject = Instantiate(MyPlayerPrefab);
+			GameObject playerObject = MyPlayerObject;
 			playerObject.name = characterName;
 			playerObject.transform.position = new Vector3(px, py, pz);
-			playerObject.transform.rotation = Quaternion.Euler(new Vector3(rx, ry, rz));
-			// Add MyPlayer specific components
-			playerObject.AddComponent<PlayerController>();
-			playerObject.transform.Find("FirstPersonCharacter").gameObject.AddComponent<PlayerCameraController>();
 			// Add universal player components
-			playerObject.AddComponent<CharacterReference>();
 			playerObject.GetComponent<CharacterReference>().CharacterId = characterId;
-			playerObject.AddComponent<CharacterAnimator>();
 			// Create new player
 			ConnectedCharacters.MyPlayer = new ClientPlayer(
 				characterId, 
@@ -119,16 +111,17 @@
 				apparelId,
 				dialogueId
 			);
+			playerObject.GetComponent<CharacterAvatarController>().UpdateWeapon(ConnectedCharacters.MyPlayer);
+			playerObject.GetComponent<CharacterAvatarController>().UpdateApparel(ConnectedCharacters.MyPlayer);
 			// Add my player to players dictionary
 			ConnectedCharacters.Characters.Add(characterId, ConnectedCharacters.MyPlayer);
 			ConnectedCharacters.Players.Add(characterId, ConnectedCharacters.MyPlayer);
-			//Disable login menu
-			CanvasSettings.LoginMenu.SetActive(false);
 			// Activate player HUD
 			CanvasSettings.PlayerHud.GetComponent<PlayerHUDController>().Player = ConnectedCharacters.MyPlayer;
 			CanvasSettings.PlayerHud.SetActive(true);
 			// We are now safe to start
 			NetworkSettings.IsStarted = true;
+			playerObject.transform.rotation = Quaternion.Euler(new Vector3(rx, ry, rz));
 		}
 
 		private void SpawnPlayer(
@@ -154,12 +147,8 @@
 			playerObject.name = characterName;
 			playerObject.transform.position = new Vector3(px, py, pz);
 			playerObject.transform.rotation = Quaternion.Euler(new Vector3(rx, ry, rz));
-			// Add non-MyPlayer specific components
-			playerObject.AddComponent<CharacterLerpController>();
 			// Add universal player components
-			playerObject.AddComponent<CharacterReference>();
 			playerObject.GetComponent<CharacterReference>().CharacterId = characterId;
-			playerObject.AddComponent<CharacterAnimator>();
 			// Create new player
 			ClientPlayer player = new ClientPlayer(
 				characterId, 
@@ -178,6 +167,8 @@
 				apparelId,
 				dialogueId
 			);
+			playerObject.GetComponent<CharacterAvatarController>().UpdateWeapon(player);
+			playerObject.GetComponent<CharacterAvatarController>().UpdateApparel(player);
 			// Add player to players dictionary
 			ConnectedCharacters.Characters.Add(characterId, player);
 			ConnectedCharacters.Players.Add(characterId, player);

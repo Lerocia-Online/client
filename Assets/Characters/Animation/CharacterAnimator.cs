@@ -2,12 +2,12 @@ namespace Characters.Animation {
   using UnityEngine;
 
   public class CharacterAnimator : MonoBehaviour {
-    public bool Attacking;
+    public GameObject CharacterObject;
     private Animator _animator;
+    public bool Attacking;
 
     private void Start() {
-      Attacking = false;
-      _animator = GetComponent<Animator>();
+      _animator = CharacterObject.GetComponent<Animator>();
     }
 
     private void Update() {
@@ -17,7 +17,8 @@ namespace Characters.Animation {
     }
 
     public void Attack() {
-      _animator.Play("Attack");
+      Attacking = true;
+      _animator.SetTrigger("Attack");
     }
   }
 }

@@ -36,11 +36,7 @@ namespace Characters.Players.Controllers {
           if (_hit.transform.gameObject.GetComponent<CharacterReference>().CharacterId != _lastNPCHit) {
             _lastNPCHit = _hit.transform.gameObject.GetComponent<CharacterReference>().CharacterId;
             CanvasSettings.PlayerHudController.ActivateInteractableView();
-            if (!ConnectedCharacters.NPCs[_lastNPCHit].IsDead) {
-              CanvasSettings.PlayerHudController.SetNPCView(ConnectedCharacters.NPCs[_lastNPCHit].CharacterName);
-            } else {
-              CanvasSettings.PlayerHudController.SetLootView(ConnectedCharacters.NPCs[_lastNPCHit].CharacterName);
-            }
+            CanvasSettings.PlayerHudController.SetNPCView(ConnectedCharacters.NPCs[_lastNPCHit]);
           }
 
           if (Input.GetKeyDown(KeyCode.E)) {

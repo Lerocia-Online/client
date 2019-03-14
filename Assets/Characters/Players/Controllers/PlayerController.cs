@@ -3,12 +3,11 @@
   using Menus;
   using Networking;
   using Animation;
-  using NPCs;
   using Lerocia.Characters;
 
   public class PlayerController : MonoBehaviour {
     private CharacterAnimator _characterAnimator;
-    private const float Range = 10f;
+    public bool CanHit;
 
     private void Start() {
       _characterAnimator = gameObject.GetComponent<CharacterAnimator>();
@@ -23,33 +22,30 @@
         CanvasSettings.TogglePauseMenu();
       }
 
+      if (Input.GetButtonDown("Fire1") && !_characterAnimator.Attacking) {
+        NetworkSend.Reliable("ATK|");
+        _characterAnimator.Attack();
+      }
+
       if (!_characterAnimator.Attacking) {
-        if (Input.GetButtonDown("Fire1")) {
-          NetworkSend.Reliable("ATK|");
-          _characterAnimator.Attacking = true;
-          _characterAnimator.Attack();
-          Attack();
-        }
+        CanHit = true;
       }
     }
 
-    private void Attack() {
-      RaycastHit hit;
-      if (Physics.Raycast(gameObject.transform.position, transform.forward, out hit, Range)) {
-        if (hit.transform.CompareTag("Player")) {
-          int characterId = hit.transform.gameObject.GetComponent<CharacterReference>().CharacterId;
-          CanvasSettings.PlayerHudController.ActivateEnemyView(ConnectedCharacters.Players[characterId]);
-          NetworkSend.Reliable("HIT|" + characterId + "|" + ConnectedCharacters.MyPlayer.Damage);
-          ConnectedCharacters.Players[characterId].TakeDamage(ConnectedCharacters.MyPlayer.Damage);
-        }
+    public void HitPlayer(GameObject hit) {
+      CanHit = false;
+      int characterId = hit.GetComponent<CharacterReference>().CharacterId;
+      CanvasSettings.PlayerHudController.ActivateEnemyView(ConnectedCharacters.Players[characterId]);
+      NetworkSend.Reliable("HIT|" + characterId + "|" + ConnectedCharacters.MyPlayer.Damage);
+      ConnectedCharacters.Players[characterId].TakeDamage(ConnectedCharacters.MyPlayer.Damage);
+    }
 
-        if (hit.transform.CompareTag("NPC")) {
-          int npcId = hit.transform.gameObject.GetComponent<CharacterReference>().CharacterId;
-          CanvasSettings.PlayerHudController.ActivateEnemyView(ConnectedCharacters.NPCs[npcId]);
-          NetworkSend.Reliable("HITNPC|" + npcId + "|" + ConnectedCharacters.MyPlayer.Damage);
-          ConnectedCharacters.NPCs[npcId].TakeDamage(ConnectedCharacters.MyPlayer.Damage);
-        }
-      }
+    public void HitNPC(GameObject hit) {
+      CanHit = false;
+      int npcId = hit.GetComponent<CharacterReference>().CharacterId;
+      CanvasSettings.PlayerHudController.ActivateEnemyView(ConnectedCharacters.NPCs[npcId]);
+      NetworkSend.Reliable("HITNPC|" + npcId + "|" + ConnectedCharacters.MyPlayer.Damage);
+      ConnectedCharacters.NPCs[npcId].TakeDamage(ConnectedCharacters.MyPlayer.Damage);
     }
   }
 }

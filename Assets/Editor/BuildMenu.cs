@@ -6,7 +6,7 @@ public class BuildMenu : MonoBehaviour {
   [MenuItem("Build/Build Mac")]
   public static void BuildMac() {
     BuildPlayerOptions buildClientPlayerOptions = new BuildPlayerOptions();
-    buildClientPlayerOptions.scenes = new[] { "Assets/Scenes/Client.unity" };
+    buildClientPlayerOptions.scenes = new[] { "Assets/Scenes/Splash.unity", "Assets/Scenes/Lerocia.unity" };
     buildClientPlayerOptions.locationPathName = "../builds/Client";
     buildClientPlayerOptions.target = BuildTarget.StandaloneOSX;
     buildClientPlayerOptions.options = BuildOptions.None;
@@ -17,7 +17,7 @@ public class BuildMenu : MonoBehaviour {
   [MenuItem("Build/Build Windows")]
   public static void BuildWindows() {
     BuildPlayerOptions buildClientPlayerOptions = new BuildPlayerOptions();
-    buildClientPlayerOptions.scenes = new[] { "Assets/Scenes/Client.unity" };
+    buildClientPlayerOptions.scenes = new[] { "Assets/Scenes/Splash.unity", "Assets/Scenes/Lerocia.unity" };
     buildClientPlayerOptions.locationPathName = "../builds/Client.exe";
     buildClientPlayerOptions.target = BuildTarget.StandaloneWindows64;
     buildClientPlayerOptions.options = BuildOptions.None;

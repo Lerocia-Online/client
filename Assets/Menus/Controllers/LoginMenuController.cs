@@ -2,6 +2,7 @@
 	using System.Collections;
 	using UnityEngine;
 	using UnityEngine.UI;
+	using UnityEngine.SceneManagement;
 	using Networking;
 	using Networking.Constants;
 	using Lerocia.Characters;
@@ -48,6 +49,7 @@
 						_errorText.text = "Login successful";
 						ConnectedCharacters.MyDatabasePlayer = databasePlayer;
 						NetworkSettings.InitializeNetworkTransport();
+						SceneManager.LoadScene("Lerocia");
 					}
 				} else {
 					_errorText.text = databasePlayer.error;

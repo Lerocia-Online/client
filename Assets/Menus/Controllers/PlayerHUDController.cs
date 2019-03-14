@@ -6,7 +6,7 @@
   using UnityEngine.UI;
   using Lerocia.Characters;
   using Lerocia.Characters.Players;
-  using Characters.NPCs;
+  using Lerocia.Characters.NPCs;
   using Lerocia.Items;
 
   public class PlayerHUDController : MonoBehaviour {
@@ -36,13 +36,13 @@
     private Text _captionText;
     private Character _enemyCharacter;
     private float _enemyViewUpdateTime;
-    private const float EnemyViewTimer = 10.0f;
+    private const float EnemyViewTimer = 30.0f;
     private float _healthViewUpdateTime;
-    private const float HealthViewTimer = 10.0f;
+    private const float HealthViewTimer = 30.0f;
     private float _staminaViewUpdateTime;
-    private const float StaminaViewTimer = 10.0f;
+    private const float StaminaViewTimer = 30.0f;
     private float _captionViewUpdateTime;
-    private const float CaptionViewTimer = 5.0f;
+    private const float CaptionViewTimer = 10.0f;
     public Player Player;
 
     // Use this for initialization
@@ -74,9 +74,12 @@
     }
 
     private void Update() {
+      _healthBarSlider.maxValue = Player.MaxHealth;
       _healthBarSlider.value = Player.CurrentHealth;
+      _staminaBarSlider.maxValue = Player.MaxStamina;
       _staminaBarSlider.value = Player.CurrentStamina;
       if (_enemyCharacter != null) {
+        _enemyHealthBar.maxValue = _enemyCharacter.MaxHealth;
         _enemyHealthBar.value = _enemyCharacter.CurrentHealth;
         if (Time.time - _enemyViewUpdateTime > EnemyViewTimer) {
           DeactivateEnemyView();
@@ -143,14 +146,17 @@
       }
     }
 
-    public void SetNPCView(string npcName) {
-      _helpText.text = "(E) Talk";
-      _name.text = npcName;
-    }
-
-    public void SetLootView(string name) {
-      _helpText.text = "(E) Loot";
-      _name.text = name;
+    public void SetNPCView(NPC npc) {
+      if (npc.IsDead) {
+        _helpText.text = "(E) Loot";
+        _name.text = npc.CharacterName;
+      } else if (npc.DialogueId >= 0) {
+        _helpText.text = "(E) Talk";
+        _name.text = npc.CharacterName;
+      } else {
+        _helpText.text = npc.CharacterName;
+        _name.text = "";
+      }
     }
 
     public void SetItemView(BaseItem item) {
