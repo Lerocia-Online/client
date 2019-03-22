@@ -1,4 +1,6 @@
-﻿namespace Menus.Controllers {
+﻿using Lerocia.Characters.Bodies;
+
+namespace Menus.Controllers {
   using System.Collections.Generic;
   using System;
   using System.Reflection;
@@ -130,7 +132,7 @@
 
     public void Interact(string text) {
       string[] options = ConnectedCharacters
-        .NPCs[_currentInteractingCharacter.Avatar.GetComponent<CharacterReference>().CharacterId]
+        .Characters[_currentInteractingCharacter.Avatar.GetComponent<CharacterReference>().CharacterId]
         .Interact(text);
       if (options != null) {
         if (options.Length > 1) {
@@ -147,16 +149,28 @@
     }
 
     public void SetNPCView(NPC npc) {
-      if (npc.IsDead) {
-        _helpText.text = "(E) Loot";
-        _name.text = npc.CharacterName;
-      } else if (npc.DialogueId >= 0) {
+      if (npc.DialogueId >= 0) {
         _helpText.text = "(E) Talk";
         _name.text = npc.CharacterName;
       } else {
         _helpText.text = npc.CharacterName;
         _name.text = "";
       }
+    }
+
+    public void SetPlayerView(Player player) {
+      if (player.DialogueId >= 0) {
+        _helpText.text = "(E) Talk";
+        _name.text = player.CharacterName;
+      } else {
+        _helpText.text = player.CharacterName;
+        _name.text = "";
+      }
+    }
+
+    public void SetBodyView(Body body) {
+      _helpText.text = "(E) Loot";
+      _name.text = body.CharacterName;
     }
 
     public void SetItemView(BaseItem item) {

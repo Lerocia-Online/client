@@ -11,12 +11,8 @@
     
     private void OnTriggerEnter(Collider col) {
       if (PlayerController.CanHit) {
-        if (col.transform.CompareTag("Player")) {
-          PlayerController.HitPlayer(col.gameObject);
-        }
-
-        if (col.transform.CompareTag("NPC")) {
-          PlayerController.HitNPC(col.gameObject);
+        if (col.transform.CompareTag("Player") || col.transform.CompareTag("NPC")) {
+          PlayerController.Hit(col.gameObject);
         }
       }
     }

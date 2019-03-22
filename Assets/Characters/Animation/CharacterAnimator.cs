@@ -6,7 +6,7 @@ namespace Characters.Animation {
     private Animator _animator;
     public bool Attacking;
 
-    private void Start() {
+    private void Awake() {
       _animator = CharacterObject.GetComponent<Animator>();
     }
 
@@ -19,6 +19,10 @@ namespace Characters.Animation {
     public void Attack() {
       Attacking = true;
       _animator.SetTrigger("Attack");
+    }
+
+    public void Die() {
+      _animator.SetTrigger("Die");
     }
   }
 }

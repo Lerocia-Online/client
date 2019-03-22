@@ -9,8 +9,10 @@
     public static GameObject PlayerHud;
     public static GameObject PauseMenu;
     public static GameObject InventoryMenu;
+    public static GameObject DeathMenu;
     public static InventoryMenuController InventoryMenuController;
     public static PlayerHUDController PlayerHudController;
+    public static GameObject MyCharacter;
 
     public static void InitializeCanvases() {
       PlayerHud = GameObject.Find("PlayerHUD");
@@ -21,6 +23,8 @@
       InventoryMenu = GameObject.Find("InventoryMenu");
       InventoryMenuController = InventoryMenu.GetComponent<InventoryMenuController>();
       InventoryMenu.SetActive(false);
+      DeathMenu = GameObject.Find("DeathMenu");
+      DeathMenu.SetActive(false);
     }
 
     public static void ToggleInventoryMenu(Character character, string interaction) {
@@ -53,19 +57,26 @@
       }
     }
 
-    private static void DeactivateMenu() {
+    public static void ActivateDeathMenu() {
+      DeactivateMenu();
+      DeathMenu.SetActive(true);
+      PlayerHud.SetActive(false);
+    }
+
+    public static void DeactivateMenu() {
       ToggleControl(true);
       PauseMenu.SetActive(false);
       if (InventoryMenu.activeSelf) {
         InventoryMenuController.CloseMenu();
         InventoryMenu.SetActive(false);
       }
+      DeathMenu.SetActive(false);
       PlayerHud.SetActive(true);
     }
 
     public static void ToggleControl(bool state) {
       ConnectedCharacters.MyPlayer.Avatar.GetComponent<FirstPersonController>().enabled = state;
-      Camera.main.GetComponent<PlayerCameraController>().enabled = state;
+      MyCharacter.GetComponent<PlayerCameraController>().enabled = state;
     }
   }
 }

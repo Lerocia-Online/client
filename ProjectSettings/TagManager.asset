@@ -6,9 +6,7 @@ TagManager:
   tags:
   - Item
   - NPC
-  - friendly
-  - enemy
-  - passive
+  - Body
   layers:
   - Default
   - TransparentFX

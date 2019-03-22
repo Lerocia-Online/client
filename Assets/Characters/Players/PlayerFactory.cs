@@ -26,7 +26,9 @@
 			int baseArmor,
 			int weaponId, 
 			int apparelId,
-			int dialogueId
+			int dialogueId,
+			float ox, float oy, float oz,
+			bool isDead
 		) {
 			if (ConnectedCharacters.MyDatabasePlayer.character_id == characterId) {
 				SpawnMyPlayer(
@@ -45,7 +47,8 @@
 					baseArmor,
 					weaponId, 
 					apparelId,
-					dialogueId
+					dialogueId,
+					ox, oy, oz
 				);
 			} else {
 				SpawnPlayer(
@@ -64,7 +67,9 @@
 					baseArmor,
 					weaponId, 
 					apparelId,
-					dialogueId
+					dialogueId,
+					ox, oy, oz,
+					isDead
 				);
 			}
 		}
@@ -85,7 +90,8 @@
 			int baseArmor,
 			int weaponId, 
 			int apparelId,
-			int dialogueId
+			int dialogueId,
+			float ox, float oy, float oz
 		) {
 			// Create my player object
 			GameObject playerObject = MyPlayerObject;
@@ -109,7 +115,8 @@
 				baseArmor,
 				weaponId, 
 				apparelId,
-				dialogueId
+				dialogueId,
+				new Vector3(ox, oy, oz)
 			);
 			playerObject.GetComponent<CharacterAvatarController>().UpdateWeapon(ConnectedCharacters.MyPlayer);
 			playerObject.GetComponent<CharacterAvatarController>().UpdateApparel(ConnectedCharacters.MyPlayer);
@@ -119,6 +126,7 @@
 			// Activate player HUD
 			CanvasSettings.PlayerHud.GetComponent<PlayerHUDController>().Player = ConnectedCharacters.MyPlayer;
 			CanvasSettings.PlayerHud.SetActive(true);
+			CanvasSettings.MyCharacter = playerObject.transform.Find("Character").gameObject;
 			// We are now safe to start
 			NetworkSettings.IsStarted = true;
 			playerObject.transform.rotation = Quaternion.Euler(new Vector3(rx, ry, rz));
@@ -140,7 +148,9 @@
 			int baseArmor,
 			int weaponId, 
 			int apparelId,
-			int dialogueId
+			int dialogueId,
+			float ox, float oy, float oz,
+			bool isDead
 		) {
 			// Create player object
 			GameObject playerObject = Instantiate(PlayerPrefab);
@@ -165,10 +175,14 @@
 				baseArmor,
 				weaponId, 
 				apparelId,
-				dialogueId
+				dialogueId,
+				new Vector3(ox, oy, oz)
 			);
 			playerObject.GetComponent<CharacterAvatarController>().UpdateWeapon(player);
 			playerObject.GetComponent<CharacterAvatarController>().UpdateApparel(player);
+			if (isDead) {
+				player.Death();
+			}
 			// Add player to players dictionary
 			ConnectedCharacters.Characters.Add(characterId, player);
 			ConnectedCharacters.Players.Add(characterId, player);

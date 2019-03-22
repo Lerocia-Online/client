@@ -32,20 +32,12 @@
       }
     }
 
-    public void HitPlayer(GameObject hit) {
+    public void Hit(GameObject hit) {
       CanHit = false;
       int characterId = hit.GetComponent<CharacterReference>().CharacterId;
-      CanvasSettings.PlayerHudController.ActivateEnemyView(ConnectedCharacters.Players[characterId]);
+      CanvasSettings.PlayerHudController.ActivateEnemyView(ConnectedCharacters.Characters[characterId]);
       NetworkSend.Reliable("HIT|" + characterId + "|" + ConnectedCharacters.MyPlayer.Damage);
-      ConnectedCharacters.Players[characterId].TakeDamage(ConnectedCharacters.MyPlayer.Damage);
-    }
-
-    public void HitNPC(GameObject hit) {
-      CanHit = false;
-      int npcId = hit.GetComponent<CharacterReference>().CharacterId;
-      CanvasSettings.PlayerHudController.ActivateEnemyView(ConnectedCharacters.NPCs[npcId]);
-      NetworkSend.Reliable("HITNPC|" + npcId + "|" + ConnectedCharacters.MyPlayer.Damage);
-      ConnectedCharacters.NPCs[npcId].TakeDamage(ConnectedCharacters.MyPlayer.Damage);
+      ConnectedCharacters.Characters[characterId].TakeDamage(ConnectedCharacters.MyPlayer.Damage);
     }
   }
 }

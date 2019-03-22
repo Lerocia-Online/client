@@ -1,11 +1,11 @@
-namespace Characters.Players {
-  using UnityEngine;
-  using Lerocia.Characters.Players;
-  using Lerocia.Characters;
+namespace Characters.Bodies {
+  using Lerocia.Characters.Bodies;
   using Menus;
+  using UnityEngine;
+  using Lerocia.Characters;
 
-  public class ClientPlayer : Player {
-    public ClientPlayer(
+  public class ClientBody : Body {
+    public ClientBody(
       int characterId, 
       string characterName, 
       string characterPersonality,
@@ -13,15 +13,14 @@ namespace Characters.Players {
       int maxHealth, 
       int currentHealth, 
       int maxStamina,
-      int currentStamina,
+      int currentStamina, 
       int gold, 
       int baseWeight,
-      int baseDamage, 
-      int baseArmor, 
-      int weaponId, 
-      int apparelId,
-      int dialogueId,
-      Vector3 origin
+      int baseDamage,
+      int baseArmor,
+      int weapon,
+      int apparel,
+      int dialogueId
     ) : base(
       characterId, 
       characterName, 
@@ -29,16 +28,15 @@ namespace Characters.Players {
       avatar, 
       maxHealth, 
       currentHealth, 
-      maxStamina, 
+      maxStamina,
       currentStamina, 
-      gold, 
+      gold,
       baseWeight,
-      baseDamage, 
-      baseArmor, 
-      weaponId,
-      apparelId,
-      dialogueId,
-      origin
+      baseDamage,
+      baseArmor,
+      weapon,
+      apparel,
+      dialogueId
     ) { }
     
     public override string[] Interact(string prompt) {
@@ -51,6 +49,10 @@ namespace Characters.Players {
       }
 
       return null;
+    }
+
+    public override void StartLoot() {
+      CanvasSettings.ToggleInventoryMenu(this, "LOOT");
     }
   }
 }

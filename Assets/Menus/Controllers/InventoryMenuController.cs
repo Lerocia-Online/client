@@ -63,6 +63,10 @@ namespace Menus.Controllers {
             if (Input.GetKeyDown(KeyCode.E)) {
               BuyItem();
             }
+          } else if (_currentInteraction == "LOOT") {
+            if (Input.GetKeyDown(KeyCode.E)) {
+              LootItem();
+            }
           }
 
           GameObject playerPanel = transform.Find("Player Panel").gameObject;
@@ -265,6 +269,12 @@ namespace Menus.Controllers {
       } else {
         Debug.Log("Item purchase failed");
       }
+    }
+    
+    private void LootItem() {
+      ConnectedCharacters.MyPlayer.LootItem(_currentCharacter, GetCurrentSelectedItem().GetId());
+      NetworkSend.Reliable("LOOT|" + _currentCharacter.CharacterId + "|" + GetCurrentSelectedItem().GetId());
+      RefreshMenu();
     }
 
     private void ToggleItemView(bool visible) {
