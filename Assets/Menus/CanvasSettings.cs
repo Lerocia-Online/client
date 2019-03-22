@@ -59,13 +59,18 @@
 
     public static void ActivateDeathMenu() {
       DeactivateMenu();
-      DeathMenu.SetActive(true);
+      Cursor.lockState = CursorLockMode.None;
+      Cursor.visible = true;
+      ToggleControl(false);
       PlayerHud.SetActive(false);
+      DeathMenu.SetActive(true);
     }
 
     public static void DeactivateMenu() {
       ToggleControl(true);
       PauseMenu.SetActive(false);
+      Cursor.lockState = CursorLockMode.Locked;
+      Cursor.visible = false;
       if (InventoryMenu.activeSelf) {
         InventoryMenuController.CloseMenu();
         InventoryMenu.SetActive(false);
