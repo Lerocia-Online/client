@@ -96,7 +96,6 @@ namespace Characters.Bodies {
     ) {
       GameObject avatar = Instantiate(BodyPrefab);
       avatar.name = characterName;
-      avatar.tag = "Body";
       avatar.transform.position = new Vector3(px, py, pz);
       avatar.transform.rotation = Quaternion.Euler(new Vector3(rx, ry, rz));
       ClientBody body = new ClientBody(

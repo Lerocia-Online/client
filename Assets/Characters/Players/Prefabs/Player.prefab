@@ -1704,7 +1704,7 @@ GameObject:
   - component: {fileID: 7873179731398461635}
   - component: {fileID: 7873179731390719793}
   m_Layer: 0
-  m_Name: Characters_POLYGON_Knights
+  m_Name: Characters
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
