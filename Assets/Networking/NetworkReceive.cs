@@ -220,11 +220,15 @@ namespace Networking {
           if (ConnectedCharacters.Characters[int.Parse(d[0])].RealPosition !=
               ConnectedCharacters.Characters[int.Parse(d[0])].Avatar.transform.position) {
             ConnectedCharacters.Characters[int.Parse(d[0])].IsLerpingPosition = true;
+          } else {
+            ConnectedCharacters.Characters[int.Parse(d[0])].IsLerpingPosition = false;
           }
 
           if (ConnectedCharacters.Characters[int.Parse(d[0])].RealRotation !=
               ConnectedCharacters.Characters[int.Parse(d[0])].Avatar.transform.rotation) {
             ConnectedCharacters.Characters[int.Parse(d[0])].IsLerpingRotation = true;
+          } else {
+            ConnectedCharacters.Characters[int.Parse(d[0])].IsLerpingRotation = false;
           }
 
           ConnectedCharacters.Characters[int.Parse(d[0])].TimeStartedLerping = Time.time;

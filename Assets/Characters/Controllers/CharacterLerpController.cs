@@ -1,6 +1,7 @@
 ﻿namespace Characters.Controllers {
   using UnityEngine;
   using Lerocia.Characters;
+  using Animation;
 
   public class CharacterLerpController : MonoBehaviour {
     public Character Character;
@@ -15,6 +16,9 @@
 
         Character.Avatar.transform.position =
           Vector3.Lerp(Character.LastRealPosition, Character.RealPosition, lerpPercentage);
+        Character.Avatar.GetComponent<CharacterAnimator>().Running(true);
+      } else {
+        Character.Avatar.GetComponent<CharacterAnimator>().Running(false);
       }
 
       if (Character.IsLerpingRotation) {

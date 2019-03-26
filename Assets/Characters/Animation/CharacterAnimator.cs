@@ -24,5 +24,9 @@ namespace Characters.Animation {
     public void Die() {
       _animator.SetTrigger("Die");
     }
+
+    public void Running(bool running) {
+      _animator.SetBool("Running", running);
+    }
   }
 }
