@@ -249,7 +249,7 @@ namespace Networking {
 
     private void OnAttack(int characterId) {
       if (characterId != ConnectedCharacters.MyPlayer.CharacterId) {
-        ConnectedCharacters.Players[characterId].Avatar.GetComponent<CharacterAnimator>().Attack();
+        ConnectedCharacters.Characters[characterId].Avatar.GetComponent<CharacterAnimator>().Attack();
       }
     }
 
