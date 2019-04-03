@@ -9,6 +9,7 @@ namespace Networking {
     public static int ConnectionId;
     public static byte Error;
     public static bool IsLoggingIn;
+    public static bool IsRegistering;
     public static bool IsConnected;
     public static bool IsStarted;
     
