@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5726355605361042101}
   - component: {fileID: 4790761015241479291}
   - component: {fileID: 6588389585486209822}
+  - component: {fileID: 5428180286514240087}
   m_Layer: 0
   m_Name: Sword
   m_TagString: Item
@@ -105,5 +106,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 540bc3cbad1e54235b028f686f71e26a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ItemId: 0
+  ItemId: 1
   WorldId: 0
+--- !u!114 &5428180286514240087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5726355605363025239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b66fb3c4e2184fee891b09475cd5e80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ErrorText: 
